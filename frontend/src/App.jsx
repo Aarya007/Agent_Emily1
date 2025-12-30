@@ -34,6 +34,7 @@ import { onboardingAPI } from './services/onboarding'
 import NotificationWindow from './components/NotificationWindow'
 //  Components
 import LandingPage from './pages/LandingPage.jsx'
+import WorkVillageLanding from './pages/WorkVillageLanding.jsx'
 import PrivacyPolicy from './pages/PrivacyPolicy.jsx'
 import TermsAndConditions from './pages/TermsAndConditions.jsx'
 import CancellationAndRefunds from './pages/CancellationAndRefunds.jsx'
@@ -163,6 +164,7 @@ function AppContent() {
       <Routes>
         {/*  Routes */}
         <Route path="/" element={<LandingPage />} />
+        <Route path="/workvillage" element={<WorkVillageLanding />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/terms" element={<TermsAndConditions />} />
         <Route path="/cancellation-refunds" element={<CancellationAndRefunds />} />

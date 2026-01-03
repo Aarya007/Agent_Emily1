@@ -116,3 +116,12 @@ input[type="radio"] {
   accent-color: var(--checkbox-accent-color, #db2778);
 }
 
+/* Custom Badge Colors - Using #21c45d */
+.custom-badge-bg {
+  background-color: rgba(33, 196, 93, 0.2);
+}
+
+.custom-badge-text {
+  color: #21c45d;
+}
+

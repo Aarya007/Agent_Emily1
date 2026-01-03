@@ -202,11 +202,11 @@ const EditProfileModal = ({ isOpen, onClose, onSuccess, isDarkMode = false }) =>
                           className={`w-full text-left px-2 sm:px-3 py-1.5 sm:py-2 md:py-2.5 rounded-md text-xs sm:text-sm transition-all duration-200 ${
                             index === currentStep
                               ? isDarkMode
-                                ? 'bg-red-900/50 text-red-300 font-medium shadow-sm border border-red-700'
+                                ? 'bg-pink-900/50 text-pink-300 font-medium shadow-sm border border-pink-700'
                                 : 'bg-pink-100 text-pink-700 font-medium shadow-sm'
                               : completedSteps.has(index)
                               ? isDarkMode
-                                ? 'bg-red-900/30 text-red-400 hover:bg-red-900/50 border border-red-700'
+                                ? 'bg-green-900/30 text-green-400 hover:bg-green-900/50 border border-green-700'
                                 : 'bg-green-50 text-green-700 hover:bg-green-100'
                               : isDarkMode
                               ? 'text-gray-300 hover:bg-gray-700 hover:shadow-sm'
@@ -216,7 +216,7 @@ const EditProfileModal = ({ isOpen, onClose, onSuccess, isDarkMode = false }) =>
                           <div className="flex items-center space-x-2">
                             <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-[10px] sm:text-xs font-medium transition-colors flex-shrink-0 ${
                               index === currentStep
-                                ? 'bg-red-600 text-white'
+                                ? 'bg-pink-600 text-white'
                                 : completedSteps.has(index)
                                 ? 'bg-green-500 text-white'
                                 : isDarkMode
@@ -241,7 +241,7 @@ const EditProfileModal = ({ isOpen, onClose, onSuccess, isDarkMode = false }) =>
                       ))}
                     </div>
                   </div>
-                </div>
+                </div>y
               )}
             </div>
               

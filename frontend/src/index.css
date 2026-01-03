@@ -103,16 +103,16 @@
 /* Custom Checkbox and Radio Button Styles */
 input[type="checkbox"]:checked,
 input[type="radio"]:checked {
-  accent-color: #21c45d;
-  background-color: #21c45d;
+  accent-color: #10B981;
+  background-color: #10B981;
 }
 
 /* Additional styling for better appearance */
 input[type="checkbox"] {
-  accent-color: #21c45d;
+  accent-color: #10B981;
 }
 
 input[type="radio"] {
-  accent-color: #21c45d;
+  accent-color: #10B981;
 }
 

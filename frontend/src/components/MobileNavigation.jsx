@@ -2,11 +2,11 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
-import { 
-  Home, 
-  FileText, 
-  Settings, 
-  LogOut, 
+import {
+  Home,
+  FileText,
+  Settings,
+  LogOut,
   Menu,
   X,
   BarChart3,
@@ -23,15 +23,17 @@ import {
   Bell,
   CheckCircle,
   Clock,
-  PanelRight
+  PanelRight,
+  UserPlus
 } from 'lucide-react'
 
-const MobileNavigation = ({ 
-  handleGenerateContent, 
-  generating = false, 
+const MobileNavigation = ({
+  handleGenerateContent,
+  generating = false,
   fetchingFreshData = false,
   onOpenChatHistory = null,
-  showChatHistory = false
+  showChatHistory = false,
+  parentIsDarkMode = false
 }) => {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
@@ -43,6 +45,11 @@ const MobileNavigation = ({
   const [profile, setProfile] = useState(null)
   const [profileFetched, setProfileFetched] = useState(false)
   const [expandedMenus, setExpandedMenus] = useState({})
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    // Default to dark mode for mobile
+    const saved = localStorage.getItem('darkMode')
+    return saved !== null ? saved === 'true' : true // Default to true (dark mode)
+  })
 
   // Cache key for localStorage
   const getCacheKey = (userId) => `profile_${userId}`
@@ -94,41 +101,24 @@ const MobileNavigation = ({
 
   const navigationItems = [
     {
-      name: 'Dashboard',
+      name: 'Discussions',
       href: '/dashboard',
       icon: Home
     },
     {
       name: 'Content',
-      icon: FileText,
-      hasSubmenu: true,
-      submenu: [
-        {
-          name: 'Social',
-          href: '/content',
-          icon: FileText
-        },
-        {
-          name: 'Blogs',
-          href: '/blogs',
-          icon: BookOpen
-        }
-      ]
+      href: '/created-content',
+      icon: FileText
     },
     {
-      name: 'Social Media',
+      name: 'Happenings',
       href: '/social',
       icon: Share2
     },
     {
-      name: 'Analytics',
-      href: '/analytics',
-      icon: BarChart3
-    },
-    {
-      name: 'Ads',
-      href: '/ads',
-      icon: Megaphone
+      name: 'Leads',
+      href: '/leads',
+      icon: UserPlus
     },
     {
       name: 'Settings',
@@ -138,6 +128,11 @@ const MobileNavigation = ({
         {
           name: 'Connections',
           href: '/settings',
+          icon: Settings
+        },
+        {
+          name: 'Preferences',
+          action: 'preferences',
           icon: Settings
         },
         {
@@ -191,6 +186,33 @@ const MobileNavigation = ({
   const displayName = useMemo(() => {
     return profile?.name || user?.user_metadata?.name || user?.email || 'User'
   }, [profile, user])
+
+  // Apply dark mode to document body
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+    // Save preference to localStorage
+    localStorage.setItem('darkMode', isDarkMode.toString())
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new CustomEvent('localStorageChange', {
+      detail: { key: 'darkMode', newValue: isDarkMode.toString() }
+    }))
+  }, [isDarkMode])
+
+  // Handle submenu item clicks
+  const handleSubmenuClick = (item) => {
+    if (item.action === 'preferences') {
+      setIsDarkMode(!isDarkMode)
+      return
+    }
+    if (item.href) {
+      navigate(item.href)
+    }
+    setIsMenuOpen(false)
+  }
 
   // Close menu and notifications when clicking outside
   useEffect(() => {
@@ -393,33 +415,28 @@ const MobileNavigation = ({
   return (
     <>
       {/* Mobile Header */}
-      <div className="md:hidden fixed top-0 left-0 right-0 bg-white shadow-sm border-b z-40">
+      <div className={`md:hidden fixed top-0 left-0 right-0 shadow-sm border-b z-40 ${
+        parentIsDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'
+      }`}>
         <div className="px-3 py-2">
           {/* Single Row Layout */}
           <div className="flex items-center justify-between w-full">
             {/* Logo/Brand - Clickable */}
-            <button 
+            <button
               onClick={() => navigate('/')}
               className="flex items-center hover:opacity-80 transition-opacity duration-200"
             >
-              <div className="w-8 h-8 rounded-full mr-3 overflow-hidden">
-                <img
-                  src="/emily_icon.png"
-                  alt="Emily"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div>
-                <h1 className="text-lg font-bold text-gray-900">Emily</h1>
+              <div className="text-lg font-semibold bg-gradient-to-r from-pink-600 via-pink-500 to-pink-400 bg-clip-text text-transparent drop-shadow-sm">
+                atsn ai
               </div>
             </button>
 
             {/* Right Side - Action Buttons + Hamburger Menu */}
             <div className="flex items-center space-x-1">
-              {/* Chat History Button - Only on dashboard/emily page */}
-              {(location.pathname === '/' || location.pathname === '/dashboard' || location.pathname === '/emily') && onOpenChatHistory && (
+              {/* Chat History Button */}
+              {onOpenChatHistory && (
                 <button
-                  onClick={() => onOpenChatHistory()}
+                  onClick={onOpenChatHistory}
                   className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
                   title="Chat History"
                 >
@@ -430,7 +447,11 @@ const MobileNavigation = ({
               {/* Hamburger Menu */}
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+                className={`p-1.5 rounded-lg transition-colors ${
+                  parentIsDarkMode
+                    ? 'hover:bg-gray-800 text-gray-300'
+                    : 'hover:bg-gray-100'
+                }`}
               >
                 {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
               </button>
@@ -538,12 +559,17 @@ const MobileNavigation = ({
         </div>
       )}
 
+
       {/* Mobile Menu Overlay */}
       {isMenuOpen && (
-        <div className="md:hidden fixed inset-0 z-50 bg-white/95 backdrop-blur-xl mobile-menu-container">
+        <div className={`md:hidden fixed inset-0 z-50 backdrop-blur-xl mobile-menu-container ${
+          parentIsDarkMode ? 'bg-gray-900/95' : 'bg-white/95'
+        }`}>
           <div className="flex flex-col h-full">
             {/* Menu Header */}
-            <div className="p-4 border-b border-gray-200">
+            <div className={`p-4 border-b ${
+              parentIsDarkMode ? 'border-gray-700' : 'border-gray-200'
+            }`}>
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
                   <div className="w-10 h-10 rounded-full mr-3 overflow-hidden">
@@ -554,15 +580,21 @@ const MobileNavigation = ({
                     />
                   </div>
                   <div>
-                    <h1 className="text-xl font-bold text-gray-900">Emily</h1>
-                    <p className="text-sm text-gray-500">AI Marketing</p>
+                    <h1 className={`text-xl font-bold ${
+                      parentIsDarkMode ? 'text-gray-100' : 'text-gray-900'
+                    }`}>Emily</h1>
+                    <p className={`text-sm ${
+                      parentIsDarkMode ? 'text-gray-400' : 'text-gray-500'
+                    }`}>AI Marketing</p>
                   </div>
                 </div>
                 <button
                   onClick={() => setIsMenuOpen(false)}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  className={`p-2 rounded-lg transition-colors ${
+                    parentIsDarkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-100'
+                  }`}
                 >
-                  <X size={24} />
+                  <X size={24} className={parentIsDarkMode ? 'text-gray-300' : ''} />
                 </button>
               </div>
             </div>
@@ -582,6 +614,8 @@ const MobileNavigation = ({
                         className={`w-full flex items-center p-4 rounded-lg transition-all duration-200 group ${
                           active
                             ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-lg'
+                            : parentIsDarkMode
+                            ? 'text-gray-300 hover:bg-gray-800 hover:text-gray-100'
                             : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
                         }`}
                       >
@@ -606,17 +640,33 @@ const MobileNavigation = ({
                             return (
                               <button
                                 key={subItem.name}
-                                onClick={() => navigate(subItem.href)}
+                                onClick={() => handleSubmenuClick(subItem)}
                                 className={`w-full flex items-center p-3 rounded-lg transition-all duration-200 group ${
                                   subActive
                                     ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-lg'
+                                    : subItem.action === 'preferences'
+                                    ? parentIsDarkMode
+                                      ? 'text-gray-300 hover:bg-gray-800 hover:text-gray-100'
+                                      : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                                    : parentIsDarkMode
+                                    ? 'text-gray-300 hover:bg-gray-800 hover:text-gray-100'
                                     : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
                                 }`}
                               >
                                 <SubIcon className="w-5 h-5 mr-3" />
                                 <div className="flex-1 text-left">
-                                  <div className="font-medium">{subItem.name}</div>
+                                  <div className="font-medium">
+                                    {subItem.action === 'preferences'
+                                      ? `Theme: ${parentIsDarkMode ? 'Dark' : 'Light'}`
+                                      : subItem.name
+                                    }
+                                  </div>
                                 </div>
+                                {subItem.action === 'preferences' && (
+                                  <div className={`w-4 h-4 rounded-full border-2 transition-colors ${
+                                    parentIsDarkMode ? 'bg-gray-600 border-gray-400' : 'bg-yellow-400 border-yellow-300'
+                                  }`} />
+                                )}
                               </button>
                             )
                           })}
@@ -631,11 +681,13 @@ const MobileNavigation = ({
                   <button
                     key={item.name}
                     onClick={() => navigate(item.href)}
-                    className={`w-full flex items-center p-4 rounded-lg transition-all duration-200 group ${
-                      active
-                        ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-lg'
-                        : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-                    }`}
+                        className={`w-full flex items-center p-4 rounded-lg transition-all duration-200 group ${
+                          active
+                            ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-lg'
+                            : parentIsDarkMode
+                            ? 'text-gray-300 hover:bg-gray-800 hover:text-gray-100'
+                            : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                        }`}
                   >
                     <Icon className="w-6 h-6 mr-4" />
                     <div className="flex-1 text-left">
@@ -647,11 +699,17 @@ const MobileNavigation = ({
             </nav>
 
             {/* User Section */}
-            <div className="p-4 border-t border-gray-200">
+            <div className={`p-4 border-t ${
+              parentIsDarkMode ? 'border-gray-700' : 'border-gray-200'
+            }`}>
               <div className="space-y-3">
                 <button
                   onClick={() => navigate('/profile')}
-                  className="w-full flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors group"
+                  className={`w-full flex items-center p-4 rounded-lg transition-colors group ${
+                    parentIsDarkMode
+                      ? 'bg-gray-800 hover:bg-gray-700'
+                      : 'bg-gray-50 hover:bg-gray-100'
+                  }`}
                 >
                   <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center mr-4 overflow-hidden">
                     {profile?.logo_url && (
@@ -663,16 +721,24 @@ const MobileNavigation = ({
                     )}
                   </div>
                   <div className="flex-1 min-w-0 text-left">
-                    <p className="text-lg font-medium text-gray-900 truncate">
+                    <p className={`text-lg font-medium truncate ${
+                      parentIsDarkMode ? 'text-gray-100' : 'text-gray-900'
+                    }`}>
                       {displayName}
                     </p>
-                    <p className="text-sm text-gray-500">Click to view profile</p>
+                    <p className={`text-sm ${
+                      parentIsDarkMode ? 'text-gray-400' : 'text-gray-500'
+                    }`}>Click to view profile</p>
                   </div>
                 </button>
                 
                 <button
                   onClick={handleLogout}
-                  className="w-full flex items-center p-4 text-gray-600 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors group"
+                  className={`w-full flex items-center p-4 rounded-lg transition-colors group ${
+                    parentIsDarkMode
+                      ? 'text-gray-300 hover:bg-red-900/20 hover:text-red-400'
+                      : 'text-gray-600 hover:bg-red-50 hover:text-red-600'
+                  }`}
                 >
                   <LogOut className="w-6 h-6 mr-4" />
                   <span className="font-medium text-lg">Logout</span>

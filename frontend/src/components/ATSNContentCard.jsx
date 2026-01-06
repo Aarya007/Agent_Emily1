@@ -34,16 +34,16 @@ const ATSNContentCard = ({ content, platform, contentType, intent, onClick, isDa
 
   return (
     <div
-      className={`rounded-xl shadow-lg overflow-hidden max-w-lg w-full cursor-pointer transition-all duration-200 ${
+      className={`rounded-xl overflow-hidden max-w-lg w-full cursor-pointer transition-all duration-200 ${
         isDarkMode
-          ? 'bg-gray-800 border border-gray-700 shadow-xl hover:bg-gray-700'
+          ? 'backdrop-blur-xl bg-gray-800/60 border border-gray-700/50 shadow-2xl hover:bg-gray-800/70 hover:border-gray-600/70'
           : 'bg-white shadow-lg hover:shadow-xl'
       }`}
       onClick={onClick}
     >
       {/* Header with platform logo and name */}
       <div className={`flex items-center justify-between p-4 border-b ${
-        isDarkMode ? 'border-gray-600 bg-gray-900' : 'border-gray-100'
+        isDarkMode ? 'border-gray-700/30 bg-gray-900/40 backdrop-blur-sm' : 'border-gray-100'
       }`}>
         <div className="flex items-center gap-3">
           {getPlatformIcon(platform)}
@@ -119,7 +119,7 @@ const ATSNContentCard = ({ content, platform, contentType, intent, onClick, isDa
             )}
 
             {/* Hashtags */}
-            {content.hashtags && content.hashtags.length > 0 && (
+            {content.hashtags && Array.isArray(content.hashtags) && content.hashtags.length > 0 && (
               <p className={`text-sm ${
                 isDarkMode ? 'text-blue-400' : 'text-blue-500'
               }`}>

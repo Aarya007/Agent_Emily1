@@ -65,7 +65,7 @@ const getApiBaseUrl = () => {
 }
 const API_BASE_URL = getApiBaseUrl().replace(/\/$/, '')
 
-const ATSNChatbot = ({ externalConversations = null }) => {
+const ATSNChatbot = ({ externalConversations = null, isDarkMode = false }) => {
   const { user } = useAuth()
   const { showError, showSuccess } = useNotifications()
   const [messages, setMessages] = useState([])
@@ -112,9 +112,9 @@ const ATSNChatbot = ({ externalConversations = null }) => {
   const [isUploadingMedia, setIsUploadingMedia] = useState(false)
   const [tooltipAgent, setTooltipAgent] = useState(null)
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 })
-  const [isDarkMode, setIsDarkMode] = useState(getDarkModePreference)
   const [likedMessages, setLikedMessages] = useState(new Set())
   const [countedTasks, setCountedTasks] = useState(new Set())
+  const [isMobileView, setIsMobileView] = useState(window.innerWidth < 768)
   const messagesEndRef = useRef(null)
   const inputRef = useRef(null)
   const lastExternalConversationsRef = useRef(null)
@@ -190,8 +190,16 @@ const ATSNChatbot = ({ externalConversations = null }) => {
     scrollToBottom()
   }, [messages])
 
-  // Listen for dark mode changes from other components (like SideNavbar)
-  useStorageListener('darkMode', setIsDarkMode)
+
+  // Handle responsive mobile detection
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobileView(window.innerWidth < 768)
+    }
+
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   // Handle thinking message phases
   useEffect(() => {
@@ -2358,24 +2366,30 @@ const ATSNChatbot = ({ externalConversations = null }) => {
 
   // Render agent icon based on agent name
   const renderAgentIcon = (agentName) => {
+    const iconSize = isMobileView ? 'w-8 h-8' : 'w-16 h-16';
+    const innerIconSize = isMobileView ? 'w-3 h-3' : 'w-4 h-4';
+    const orioSize = isMobileView ? 'text-lg' : 'text-xl';
+    const atsnContainerSize = isMobileView ? 'w-8 h-8' : 'w-16 h-16';
+    const atsnInnerSize = isMobileView ? 'w-6 h-6' : 'w-12 h-12';
+
     switch (agentName?.toLowerCase()) {
       case 'leo':
-        return <img src="/leo_logo.png" alt="Leo" className="w-16 h-16 rounded-full object-cover" />
+        return <img src="/leo_logo.png" alt="Leo" className={`${iconSize} rounded-full object-cover`} />
       case 'chase':
-        return <img src="/chase_logo.png" alt="Chase" className="w-16 h-16 rounded-full object-cover" />
+        return <img src="/chase_logo.png" alt="Chase" className={`${iconSize} rounded-full object-cover`} />
       case 'orio':
-        return <span className="text-xl font-bold text-white">O</span>
+        return <span className={`${orioSize} font-bold text-white`}>O</span>
       case 'atsn ai':
         // Combined logo for atsn ai welcome message - all four agents
         return (
-          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 via-blue-500 to-green-500 flex items-center justify-center relative overflow-hidden">
+          <div className={`${atsnContainerSize} rounded-full bg-gradient-to-br from-purple-500 via-blue-500 to-green-500 flex items-center justify-center relative overflow-hidden`}>
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+              <div className={`${atsnInnerSize} bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm`}>
                 <div className="grid grid-cols-2 gap-1">
-                  <img src="/emily_icon.png" alt="E" className="w-4 h-4 rounded-full object-cover" />
-                  <img src="/leo_logo.png" alt="L" className="w-4 h-4 rounded-full object-cover" />
-                  <img src="/chase_logo.png" alt="C" className="w-4 h-4 rounded-full object-cover" />
-                  <div className="w-4 h-4 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center">
+                  <img src="/emily_icon.png" alt="E" className={`${innerIconSize} rounded-full object-cover`} />
+                  <img src="/leo_logo.png" alt="L" className={`${innerIconSize} rounded-full object-cover`} />
+                  <img src="/chase_logo.png" alt="C" className={`${innerIconSize} rounded-full object-cover`} />
+                  <div className={`${innerIconSize} rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center`}>
                     <span className="text-xs font-bold text-white">O</span>
                   </div>
                 </div>
@@ -2385,7 +2399,7 @@ const ATSNChatbot = ({ externalConversations = null }) => {
         )
       case 'emily':
       default:
-        return <img src="/emily_icon.png" alt="Emily" className="w-16 h-16 rounded-full object-cover" />
+        return <img src="/emily_icon.png" alt="Emily" className={`${iconSize} rounded-full object-cover`} />
     }
   }
 
@@ -2443,7 +2457,7 @@ const ATSNChatbot = ({ externalConversations = null }) => {
 
 
   return (
-    <div className="flex flex-col h-full rounded-lg">
+    <div className={`flex-1 flex flex-col min-w-0 w-full ${isMobileView ? 'h-[calc(100vh-4rem)] overflow-hidden' : 'h-full'}`}>
       {/* Custom scrollbar styles */}
       <style dangerouslySetInnerHTML={{
         __html: `
@@ -2525,16 +2539,260 @@ const ATSNChatbot = ({ externalConversations = null }) => {
         </div>
       )}
 
+
       {/* Messages */}
       <div
-        className="flex-1 overflow-y-auto scrollbar-hide p-6 space-y-6"
+        className={`flex-1 overflow-y-auto scrollbar-hide ${
+          isMobileView ? 'p-6 space-y-6' : 'p-6 space-y-4'
+        }`}
         onClick={handleChatAreaClick}
       >
         {messages.map((message, index) => (
-          <div
-            key={message.id}
-            className={`group flex gap-3 ${message.sender === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
-          >
+          // Mobile Fullscreen Mode - ChatGPT Style
+          isMobileView ? (
+            <div key={message.id} className="space-y-3 py-2">
+              {/* User Message - Minimal Styling */}
+              {message.sender === 'user' && (
+                <div className="flex justify-end">
+                  <div className="max-w-[85%] px-4 py-2 bg-blue-500 text-white rounded-2xl rounded-br-sm text-sm break-words">
+                    {message.text}
+                  </div>
+                </div>
+              )}
+
+              {/* Agent Message - Desktop Structure for Mobile */}
+              {message.sender === 'bot' && (
+                <div
+                  key={message.id}
+                  className="group flex items-start gap-3"
+                >
+                  {/* Avatar */}
+                  <div
+                    className={`${
+                      message.agent_name?.toLowerCase() === 'emily' || message.agent_name?.toLowerCase() === 'leo' || message.agent_name?.toLowerCase() === 'chase' || message.agent_name?.toLowerCase() === 'atsn ai'
+                        ? 'w-9.5 h-9.5'
+                        : 'w-8 h-8'
+                    } rounded-full flex items-center justify-center flex-shrink-0 ${
+                      message.agent_name?.toLowerCase() === 'leo'
+                        ? '' // No background for Leo
+                      : message.agent_name?.toLowerCase() === 'chase'
+                        ? '' // No background for Chase
+                      : message.agent_name?.toLowerCase() === 'emily'
+                        ? '' // No background for Emily
+                      : message.agent_name?.toLowerCase() === 'atsn ai'
+                        ? '' // No background for atsn ai combined logo
+                      : 'bg-gradient-to-br from-purple-500 to-pink-500'
+                    }`}
+                  >
+                    {renderAgentIcon(message.agent_name)}
+                  </div>
+
+                  {/* Message Content - No Bubble */}
+                  <div className="flex-1 text-left">
+                    {/* Agent Name */}
+                    <div className={`text-xs font-medium mb-1 ${
+                      isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                    }`}>
+                      {message.agent_name || 'ATSN AI'}
+                    </div>
+
+                    {/* Agent Text */}
+                    <div className={`text-sm break-words leading-relaxed ${
+                      isDarkMode ? 'text-white' : 'text-gray-800'
+                    }`}>
+                      {message.text}
+                    </div>
+
+                    {/* Render generated content cards using ATSNContentCard */}
+                    {message.content_items && message.content_items.length > 0 && (
+                      <div className="mt-4 space-y-3">
+                        {message.content_items.map((contentItem, index) => (
+                          <ATSNContentCard
+                            key={`${message.id}-${index}`}
+                            content={contentItem}
+                            platform={contentItem.platform}
+                            contentType={contentItem.content_type || 'post'}
+                            intent={message.intent}
+                            isDarkMode={isDarkMode}
+                          />
+                        ))}
+
+                        {/* Action buttons for content management - Desktop Only */}
+                        {!isMobileView && (message.intent === 'created_content' || message.intent === 'view_content' || message.intent === 'publish_content' || message.intent === 'delete_content') && (
+                          <div className="mt-4 flex flex-col space-y-2">
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => handleSelectAll(message.content_items)}
+                                className="px-3 py-2 rounded-lg border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                              >
+                                {selectedContent.length === message.content_items.length ? 'Deselect All' : 'Select All'}
+                              </button>
+                              <span className="text-sm text-gray-600">
+                                {selectedContent.length}/{message.content_items.length} selected
+                              </span>
+                            </div>
+                            {selectedContent.length > 0 && (
+                              <div className="flex flex-col space-y-2">
+                                {message.intent === 'created_content' && (
+                                  <>
+                                    <button
+                                      onClick={handleEditSelected}
+                                      disabled={selectedContent.length > 1}
+                                      className="px-3 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                      Edit Selected ({selectedContent.length})
+                                    </button>
+                                    <button
+                                      onClick={handlePublishSelected}
+                                      disabled={isPublishing}
+                                      className="px-3 py-2 rounded-lg bg-purple-600 text-white text-sm font-medium hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                      {isPublishing ? 'Publishing...' : `Publish Selected (${selectedContent.length})`}
+                                    </button>
+                                  </>
+                                )}
+                                {message.intent === 'view_content' && (
+                                  <button
+                                    onClick={() => handleContentModal(selectedContent[0])}
+                                    disabled={selectedContent.length > 1}
+                                    className="px-3 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                                  >
+                                    View Selected ({selectedContent.length})
+                                  </button>
+                                )}
+                                {(message.intent === 'created_content' || message.intent === 'view_content' || message.intent === 'delete_content') && (
+                                  <button
+                                    onClick={handleDeleteSelected}
+                                    className="px-3 py-2 rounded-lg bg-red-600 text-white text-sm font-medium hover:bg-red-700"
+                                  >
+                                    Delete Selected ({selectedContent.length})
+                                  </button>
+                                )}
+                                {message.intent === 'publish_content' && (
+                                  <button
+                                    onClick={handlePublishSelected}
+                                    disabled={isPublishing}
+                                    className="px-3 py-2 rounded-lg bg-purple-600 text-white text-sm font-medium hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                                  >
+                                    {isPublishing ? 'Publishing...' : `Publish Selected (${selectedContent.length})`}
+                                  </button>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Action buttons for created content - Inside Agent Message */}
+                    {message.intent === 'created_content' && message.content_items && message.content_items.length > 0 && (
+                      <div className="flex flex-col items-center gap-3 mt-4">
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => handleSelectAll(message.content_items)}
+                            className="px-4 py-2 rounded-lg border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                          >
+                            {selectedContent.length === message.content_items.length ? 'Deselect All' : 'Select All'}
+                          </button>
+                          <span className="text-sm text-gray-600">
+                            {selectedContent.length}/{message.content_items.length} selected
+                          </span>
+                        </div>
+                        {selectedContent.length > 0 && (
+                          <div className="flex flex-col items-center gap-3">
+                            <button
+                              onClick={handleEditSelected}
+                              disabled={selectedContent.length > 1}
+                              className="w-full max-w-[260px] px-4 py-2 text-sm rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              Edit Selected ({selectedContent.length})
+                            </button>
+                            <button
+                              onClick={handlePublishSelected}
+                              disabled={isPublishing}
+                              className="w-full max-w-[260px] px-4 py-2 text-sm rounded-lg bg-purple-600 text-white font-medium hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              {isPublishing ? 'Publishing...' : `Publish Selected (${selectedContent.length})`}
+                            </button>
+                            <button
+                              onClick={handleDeleteSelected}
+                              className="w-full max-w-[260px] px-4 py-2 text-sm rounded-lg bg-red-600 text-white font-medium hover:bg-red-700"
+                            >
+                              Delete Selected ({selectedContent.length})
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Action buttons for publish content - Inside Agent Message */}
+                    {message.intent === 'publish_content' && message.content_items && message.content_items.length > 0 && selectedContent.length > 0 && (
+                      <div className="flex flex-col items-center gap-3 mt-4">
+                        <button
+                          onClick={handlePublishSelected}
+                          disabled={isPublishing}
+                          className="w-full max-w-[260px] px-4 py-2 text-sm rounded-lg bg-purple-600 text-white font-medium hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {isPublishing ? 'Publishing...' : `Publish Selected (${selectedContent.length})`}
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Action buttons for view content - Inside Agent Message */}
+                    {message.intent === 'view_content' && message.content_items && message.content_items.length > 0 && (
+                      <div className="flex flex-col items-center gap-3 mt-4">
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => handleSelectAll(message.content_items)}
+                            className="px-4 py-2 rounded-lg border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                          >
+                            {selectedContent.length === message.content_items.length ? 'Deselect All' : 'Select All'}
+                          </button>
+                          <span className="text-sm text-gray-600">
+                            {selectedContent.length}/{message.content_items.length} selected
+                          </span>
+                        </div>
+                        {selectedContent.length > 0 && (
+                          <div className="flex flex-col items-center gap-3">
+                            <button
+                              onClick={() => handleContentModal(selectedContent[0])}
+                              disabled={selectedContent.length > 1}
+                              className="w-full max-w-[260px] px-4 py-2 text-sm rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              View Selected ({selectedContent.length})
+                            </button>
+                            <button
+                              onClick={handleDeleteSelected}
+                              className="w-full max-w-[260px] px-4 py-2 text-sm rounded-lg bg-red-600 text-white font-medium hover:bg-red-700"
+                            >
+                              Delete Selected ({selectedContent.length})
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Action buttons for delete content - Inside Agent Message */}
+                    {message.intent === 'delete_content' && message.content_items && message.content_items.length > 0 && selectedContent.length > 0 && (
+                      <div className="flex flex-col items-center gap-3 mt-4">
+                        <button
+                          onClick={handleDeleteSelected}
+                          className="w-full max-w-[260px] px-4 py-2 text-sm rounded-lg bg-red-600 text-white font-medium hover:bg-red-700"
+                        >
+                          Delete Selected ({selectedContent.length})
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            // Desktop Mode - Original Bubble Layout
+            <div
+              key={message.id}
+              className={`group flex items-start gap-3 ${message.sender === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
+            >
             {/* Avatar */}
             <div
               className={`${
@@ -2879,8 +3137,8 @@ const ATSNChatbot = ({ externalConversations = null }) => {
                           </div>
 
 
-                                          {/* Action buttons for publish content */}
-                          {message.intent === 'publish_content' && message.content_items && message.content_items.length > 0 && selectedContent.length > 0 && (
+                                          {/* Action buttons for publish content - Desktop Only */}
+                          {!isMobileView && message.intent === 'publish_content' && message.content_items && message.content_items.length > 0 && selectedContent.length > 0 && (
                             <div className={`mt-4 flex flex-wrap items-center gap-3 p-4 backdrop-blur-md border rounded-xl shadow-lg ${
                               isDarkMode
                                 ? 'bg-gray-800/90 border-gray-700'
@@ -2912,8 +3170,8 @@ const ATSNChatbot = ({ externalConversations = null }) => {
                             </div>
                           )}
 
-                                          {/* Action buttons for created content */}
-                          {message.intent === 'created_content' && message.content_items && message.content_items.length > 0 && (
+                                          {/* Action buttons for created content - Desktop Only */}
+                          {!isMobileView && message.intent === 'created_content' && message.content_items && message.content_items.length > 0 && (
                             <div className={`mt-4 flex flex-wrap items-center gap-3 p-4 backdrop-blur-md border rounded-xl shadow-lg ${
                               isDarkMode
                                 ? 'bg-gray-800/90 border-gray-700'
@@ -2999,8 +3257,8 @@ const ATSNChatbot = ({ externalConversations = null }) => {
                             </div>
                           )}
 
-                          {/* Selection controls for view operations - below posts */}
-                          {message.intent === 'view_content' && (
+                          {/* Selection controls for view operations - Desktop Only */}
+                          {!isMobileView && message.intent === 'view_content' && (
                             <div className="mt-4 flex flex-wrap items-center gap-3 p-3 rounded-lg">
                               <div className="flex items-center gap-2">
                                 <button
@@ -3102,8 +3360,8 @@ const ATSNChatbot = ({ externalConversations = null }) => {
                             </div>
                           )}
 
-                          {/* Selection controls for delete operations - below posts */}
-                          {message.intent === 'delete_content' && (
+                          {/* Selection controls for delete operations - Desktop Only */}
+                          {!isMobileView && message.intent === 'delete_content' && (
                             <div className="mt-4 flex flex-wrap items-center gap-3 p-3 rounded-lg">
                               <div className="flex items-center gap-2">
                                 <button
@@ -3690,14 +3948,15 @@ const ATSNChatbot = ({ externalConversations = null }) => {
               )}
             </div>
           </div>
+          )
         ))}
 
         <div ref={messagesEndRef} />
       </div>
 
       {/* Input */}
-      <div className={`p-4 border-t ${
-        isDarkMode ? 'border-gray-700' : 'border-gray-200'
+      <div className={`flex-shrink-0 p-4 border-t ${
+        isDarkMode ? 'border-gray-700 bg-gray-900' : 'border-gray-200 bg-white'
       }`}>
         {/* New Chat Option */}
         <div className="flex items-center justify-between mb-3">
@@ -3713,7 +3972,7 @@ const ATSNChatbot = ({ externalConversations = null }) => {
             <span>New Chat</span>
           </button>
           <div className={`text-xs ${
-            isDarkMode ? 'text-gray-400' : 'text-gray-500'
+            isDarkMode ? 'text-gray-300' : 'text-gray-500'
           }`}>
             Press Enter to send
           </div>

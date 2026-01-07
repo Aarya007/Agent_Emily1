@@ -75,6 +75,7 @@ const ATSNChatbot = ({ externalConversations = null, isDarkMode = false }) => {
   const [conversationHistory, setConversationHistory] = useState([])
   const [agentStatus, setAgentStatus] = useState(null)
   const [selectedContent, setSelectedContent] = useState([])
+  const [lastSelectedContentId, setLastSelectedContentId] = useState(null)
   const [selectedLeadId, setSelectedLeadId] = useState(null)
   const [selectedLeads, setSelectedLeads] = useState([])
   const [leadFilters, setLeadFilters] = useState({
@@ -896,16 +897,32 @@ const ATSNChatbot = ({ externalConversations = null, isDarkMode = false }) => {
   }
 
   // Content selection functions
-  const handleContentSelect = (contentId, intent) => {
+  const handleContentSelect = (contentId, intent, messageContentItems = []) => {
+    // Check if we're switching contexts (selecting an item not in the current selection's message)
+    const isNewContext = selectedContent.length > 0 && 
+                         !messageContentItems.some(item => selectedContent.includes(item.content_id));
+
     if (intent === 'publish_content') {
       // Single selection for publishing
       setSelectedContent([contentId])
+      setLastSelectedContentId(contentId)
     } else {
       // Multi-selection for other intents
       setSelectedContent(prev => {
+        // If switching contexts, start fresh with the new item
+        if (isNewContext) {
+          setLastSelectedContentId(contentId)
+          return [contentId]
+        }
+
         if (prev.includes(contentId)) {
-          return prev.filter(id => id !== contentId)
+          const newSelection = prev.filter(id => id !== contentId)
+          if (lastSelectedContentId === contentId) {
+            setLastSelectedContentId(newSelection.length > 0 ? newSelection[newSelection.length - 1] : null)
+          }
+          return newSelection
         } else {
+          setLastSelectedContentId(contentId)
           return [...prev, contentId]
         }
       })
@@ -932,10 +949,14 @@ const ATSNChatbot = ({ externalConversations = null, isDarkMode = false }) => {
   const handleSelectAll = (contentItems) => {
     const allIds = contentItems.map(item => item.content_id)
     setSelectedContent(allIds)
+    if (allIds.length > 0) {
+      setLastSelectedContentId(allIds[allIds.length - 1])
+    }
   }
 
   const handleDeselectAll = () => {
     setSelectedContent([])
+    setLastSelectedContentId(null)
   }
 
   const handleContentClick = (contentItem) => {
@@ -2605,16 +2626,101 @@ const ATSNChatbot = ({ externalConversations = null, isDarkMode = false }) => {
 
                     {/* Render generated content cards using ATSNContentCard */}
                     {message.content_items && message.content_items.length > 0 && (
-                      <div className="mt-4 space-y-3">
+                      <div className="mt-4 space-y-4">
                         {message.content_items.map((contentItem, index) => (
-                          <ATSNContentCard
-                            key={`${message.id}-${index}`}
-                            content={contentItem}
-                            platform={contentItem.platform}
-                            contentType={contentItem.content_type || 'post'}
-                            intent={message.intent}
-                            isDarkMode={isDarkMode}
-                          />
+                          <div key={`${message.id}-${index}`} className="relative">
+                            {/* Selection checkbox for mobile branch */}
+                            {(message.intent === 'view_content' || message.intent === 'delete_content' || message.intent === 'created_content' || message.intent === 'publish_content') && (
+                              <div className="absolute top-2 right-2 z-20">
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleContentSelect(contentItem.content_id, message.intent, message.content_items);
+                                  }}
+                                  className="w-7 h-7 rounded-full bg-white/90 border-2 flex items-center justify-center transition-all shadow-lg active:scale-95"
+                                  style={{
+                                    borderColor: selectedContent.includes(contentItem.content_id) 
+                                      ? (message.intent === 'delete_content' ? '#dc2626' : '#db2777') 
+                                      : '#e5e7eb',
+                                    backgroundColor: selectedContent.includes(contentItem.content_id)
+                                      ? (message.intent === 'delete_content' ? '#dc2626' : '#db2777')
+                                      : 'rgba(255, 255, 255, 0.9)'
+                                  }}
+                                >
+                                  {selectedContent.includes(contentItem.content_id) ? (
+                                    <CheckSquare className="w-4 h-4 text-white" />
+                                  ) : (
+                                    <Square className="w-4 h-4 text-gray-400" />
+                                  )}
+                                </button>
+                              </div>
+                            )}
+
+                            <ATSNContentCard
+                              content={contentItem}
+                              platform={contentItem.platform}
+                              contentType={contentItem.content_type || 'post'}
+                              intent={message.intent}
+                              isDarkMode={isDarkMode}
+                              onClick={() => handleContentSelect(contentItem.content_id, message.intent, message.content_items)}
+                            />
+
+                            {/* Inline action buttons for mobile - appears below the last selected post */}
+                            {selectedContent.length > 0 && lastSelectedContentId === contentItem.content_id && (
+                              <div className={`mt-3 grid grid-cols-2 gap-2 p-3 rounded-xl border animate-in fade-in slide-in-from-top-2 duration-300 shadow-md ${
+                                isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+                              }`}>
+                                <button
+                                  onClick={handleEditSelected}
+                                  disabled={selectedContent.length !== 1}
+                                  className={`flex items-center justify-center gap-2 py-3 rounded-lg text-xs font-semibold transition-all active:scale-95 ${
+                                    isDarkMode 
+                                      ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30' 
+                                      : 'bg-blue-50 text-blue-600 border border-blue-100'
+                                  } disabled:opacity-40 disabled:grayscale`}
+                                >
+                                  <Edit className="w-4 h-4" />
+                                  <span>Edit {selectedContent.length === 1 ? '' : '(Select 1)'}</span>
+                                </button>
+                                <button
+                                  onClick={handlePublishSelected}
+                                  disabled={selectedContent.length === 0 || isPublishing}
+                                  className={`flex items-center justify-center gap-2 py-3 rounded-lg text-xs font-semibold transition-all active:scale-95 ${
+                                    isDarkMode 
+                                      ? 'bg-pink-600/20 text-pink-400 border border-pink-500/30' 
+                                      : 'bg-pink-50 text-pink-600 border border-pink-100'
+                                  } disabled:opacity-40 disabled:grayscale`}
+                                >
+                                  {isPublishing ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Share className="w-4 h-4" />}
+                                  <span>Publish ({selectedContent.length})</span>
+                                </button>
+                                <button
+                                  onClick={handleScheduleSelected}
+                                  disabled={selectedContent.length !== 1}
+                                  className={`flex items-center justify-center gap-2 py-3 rounded-lg text-xs font-semibold transition-all active:scale-95 ${
+                                    isDarkMode 
+                                      ? 'bg-emerald-600/20 text-emerald-400 border border-emerald-500/30' 
+                                      : 'bg-emerald-50 text-emerald-600 border border-emerald-100'
+                                  } disabled:opacity-40 disabled:grayscale`}
+                                >
+                                  <Clock className="w-4 h-4" />
+                                  <span>Schedule {selectedContent.length === 1 ? '' : '(Select 1)'}</span>
+                                </button>
+                                <button
+                                  onClick={handleDeleteSelected}
+                                  disabled={selectedContent.length === 0 || isDeleting}
+                                  className={`flex items-center justify-center gap-2 py-3 rounded-lg text-xs font-semibold transition-all active:scale-95 ${
+                                    isDarkMode 
+                                      ? 'bg-red-600/20 text-red-400 border border-red-500/30' 
+                                      : 'bg-red-50 text-red-600 border border-red-100'
+                                  } disabled:opacity-40 disabled:grayscale`}
+                                >
+                                  {isDeleting ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                                  <span>Delete ({selectedContent.length})</span>
+                                </button>
+                              </div>
+                            )}
+                          </div>
                         ))}
 
                         {/* Action buttons for content management - Desktop Only */}
@@ -2622,7 +2728,7 @@ const ATSNChatbot = ({ externalConversations = null, isDarkMode = false }) => {
                           <div className="mt-4 flex flex-col space-y-2">
                             <div className="flex items-center gap-2">
                               <button
-                                onClick={() => handleSelectAll(message.content_items)}
+                                onClick={() => selectedContent.length === message.content_items.length ? handleDeselectAll() : handleSelectAll(message.content_items)}
                                 className="px-3 py-2 rounded-lg border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50"
                               >
                                 {selectedContent.length === message.content_items.length ? 'Deselect All' : 'Select All'}
@@ -2689,7 +2795,7 @@ const ATSNChatbot = ({ externalConversations = null, isDarkMode = false }) => {
                       <div className="flex flex-col items-center gap-3 mt-4">
                         <div className="flex items-center gap-2">
                           <button
-                            onClick={() => handleSelectAll(message.content_items)}
+                            onClick={() => selectedContent.length === message.content_items.length ? handleDeselectAll() : handleSelectAll(message.content_items)}
                             className="px-4 py-2 rounded-lg border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50"
                           >
                             {selectedContent.length === message.content_items.length ? 'Deselect All' : 'Select All'}
@@ -2698,7 +2804,7 @@ const ATSNChatbot = ({ externalConversations = null, isDarkMode = false }) => {
                             {selectedContent.length}/{message.content_items.length} selected
                           </span>
                         </div>
-                        {selectedContent.length > 0 && (
+                        {selectedContent.length > 0 && !isMobileView && (
                           <div className="flex flex-col items-center gap-3">
                             <button
                               onClick={handleEditSelected}
@@ -2726,7 +2832,7 @@ const ATSNChatbot = ({ externalConversations = null, isDarkMode = false }) => {
                     )}
 
                     {/* Action buttons for publish content - Inside Agent Message */}
-                    {message.intent === 'publish_content' && message.content_items && message.content_items.length > 0 && selectedContent.length > 0 && (
+                    {message.intent === 'publish_content' && message.content_items && message.content_items.length > 0 && selectedContent.length > 0 && !isMobileView && (
                       <div className="flex flex-col items-center gap-3 mt-4">
                         <button
                           onClick={handlePublishSelected}
@@ -2743,7 +2849,7 @@ const ATSNChatbot = ({ externalConversations = null, isDarkMode = false }) => {
                       <div className="flex flex-col items-center gap-3 mt-4">
                         <div className="flex items-center gap-2">
                           <button
-                            onClick={() => handleSelectAll(message.content_items)}
+                            onClick={() => selectedContent.length === message.content_items.length ? handleDeselectAll() : handleSelectAll(message.content_items)}
                             className="px-4 py-2 rounded-lg border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50"
                           >
                             {selectedContent.length === message.content_items.length ? 'Deselect All' : 'Select All'}
@@ -2752,7 +2858,7 @@ const ATSNChatbot = ({ externalConversations = null, isDarkMode = false }) => {
                             {selectedContent.length}/{message.content_items.length} selected
                           </span>
                         </div>
-                        {selectedContent.length > 0 && (
+                        {selectedContent.length > 0 && !isMobileView && (
                           <div className="flex flex-col items-center gap-3">
                             <button
                               onClick={() => handleContentModal(selectedContent[0])}
@@ -2773,7 +2879,7 @@ const ATSNChatbot = ({ externalConversations = null, isDarkMode = false }) => {
                     )}
 
                     {/* Action buttons for delete content - Inside Agent Message */}
-                    {message.intent === 'delete_content' && message.content_items && message.content_items.length > 0 && selectedContent.length > 0 && (
+                    {message.intent === 'delete_content' && message.content_items && message.content_items.length > 0 && selectedContent.length > 0 && !isMobileView && (
                       <div className="flex flex-col items-center gap-3 mt-4">
                         <button
                           onClick={handleDeleteSelected}
@@ -3009,22 +3115,22 @@ const ATSNChatbot = ({ externalConversations = null, isDarkMode = false }) => {
                                 minWidth: message.content_items.length > 5 ? `${message.content_items.length * 336}px` : 'auto' // 320px + 16px gap (w-80 = 320px)
                               }}>
                                 {message.content_items.map((contentItem, index) => (
-                                   <div key={`${message.id}-${index}`} className="relative flex-shrink-0 w-96">
+                                  <div key={`${message.id}-${index}`} className={`relative flex-shrink-0 ${isMobileView ? 'w-[85vw] max-w-[340px]' : 'w-96'}`}>
                                     {/* Selection checkbox for view, delete, and publish operations */}
                                     {(message.intent === 'view_content' || message.intent === 'delete_content' || message.intent === 'created_content' || message.intent === 'publish_content') && (
                                       <div className="absolute top-2 right-2 z-10">
                                         <button
-                                          onClick={() => handleContentSelect(contentItem.content_id, message.intent)}
-                                          className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-colors ${
+                                          onClick={() => handleContentSelect(contentItem.content_id, message.intent, message.content_items)}
+                                          className={`${isMobileView ? 'w-8 h-8' : 'w-6 h-6'} rounded border-2 flex items-center justify-center transition-colors shadow-sm ${
                                             selectedContent.includes(contentItem.content_id)
-                                              ? (message.intent === 'delete_content' ? 'bg-red-600 border-red-600' : 'bg-purple-600 border-purple-600') + ' text-white'
-                                              : 'bg-white border-gray-300 hover:border-purple-400'
+                                              ? (message.intent === 'delete_content' ? 'bg-red-600 border-red-600' : 'bg-pink-600 border-pink-600') + ' text-white'
+                                              : 'bg-white border-gray-300 hover:border-pink-400'
                                           }`}
                                         >
                                           {selectedContent.includes(contentItem.content_id) ? (
-                                            <CheckSquare className="w-4 h-4" />
+                                            <CheckSquare className={isMobileView ? 'w-5 h-5' : 'w-4 h-4'} />
                                           ) : (
-                                            <Square className="w-4 h-4" />
+                                            <Square className={isMobileView ? 'w-5 h-5' : 'w-4 h-4'} />
                                           )}
                                         </button>
                                       </div>
@@ -3120,6 +3226,62 @@ const ATSNChatbot = ({ externalConversations = null, isDarkMode = false }) => {
                                           console.log('Edit content:', contentItem.content_id);
                                         }}
                                       />
+                                    )}
+
+                                    {/* Inline action buttons for mobile - appears below the last selected post */}
+                                    {isMobileView && selectedContent.length > 0 && lastSelectedContentId === contentItem.content_id && (
+                                      <div className={`mt-3 grid grid-cols-2 gap-2 p-3 rounded-xl border animate-in fade-in slide-in-from-top-2 duration-300 ${
+                                        isDarkMode ? 'bg-gray-800/80 border-gray-700' : 'bg-white/80 border-gray-200'
+                                      }`}>
+                                        <button
+                                          onClick={handleEditSelected}
+                                          disabled={selectedContent.length > 1}
+                                          className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                                            isDarkMode 
+                                              ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30' 
+                                              : 'bg-blue-50 text-blue-600 border border-blue-100'
+                                          } disabled:opacity-50`}
+                                        >
+                                          <Edit className="w-4 h-4" />
+                                          Edit
+                                        </button>
+                                        <button
+                                          onClick={handlePublishSelected}
+                                          disabled={isPublishing}
+                                          className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                                            isDarkMode 
+                                              ? 'bg-purple-600/20 text-purple-400 border border-purple-500/30' 
+                                              : 'bg-purple-50 text-purple-600 border border-purple-100'
+                                          } disabled:opacity-50`}
+                                        >
+                                          {isPublishing ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Share className="w-4 h-4" />}
+                                          Publish
+                                        </button>
+                                        <button
+                                          onClick={handleScheduleSelected}
+                                          disabled={selectedContent.length > 1}
+                                          className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                                            isDarkMode 
+                                              ? 'bg-emerald-600/20 text-emerald-400 border border-emerald-500/30' 
+                                              : 'bg-emerald-50 text-emerald-600 border border-emerald-100'
+                                          } disabled:opacity-50`}
+                                        >
+                                          <Clock className="w-4 h-4" />
+                                          Schedule
+                                        </button>
+                                        <button
+                                          onClick={handleDeleteSelected}
+                                          disabled={isDeleting}
+                                          className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                                            isDarkMode 
+                                              ? 'bg-red-600/20 text-red-400 border border-red-500/30' 
+                                              : 'bg-red-50 text-red-600 border border-red-100'
+                                          } disabled:opacity-50`}
+                                        >
+                                          {isDeleting ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                                          Delete
+                                        </button>
+                                      </div>
                                     )}
                                   </div>
                                 ))}

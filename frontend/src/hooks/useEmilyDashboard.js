@@ -1,43 +1,16 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import { useTheme } from '../contexts/ThemeContext'
 import { useNotifications } from '../contexts/NotificationContext'
 import { onboardingAPI } from '../services/onboarding'
 import { supabase } from '../lib/supabase'
-
-const getDarkModePreference = () => {
-  const saved = localStorage.getItem('darkMode')
-  if (saved === null) {
-    return window.innerWidth < 768
-  }
-  return saved === 'true'
-}
-
-const useStorageListener = (key, callback) => {
-  useEffect(() => {
-    const handleStorageChange = (e) => {
-      if (e.key === key) {
-        callback(e.newValue === 'true')
-      }
-    }
-    window.addEventListener('storage', handleStorageChange)
-    const handleCustomChange = (e) => {
-      if (e.detail.key === key) {
-        callback(e.detail.newValue === 'true')
-      }
-    }
-    window.addEventListener('localStorageChange', handleCustomChange)
-    return () => {
-      window.removeEventListener('storage', handleStorageChange)
-      window.removeEventListener('localStorageChange', handleCustomChange)
-    }
-  }, [key, callback])
-}
 
 const API_BASE_URL = (import.meta.env.VITE_API_URL || 'https://agent-emily.onrender.com').replace(/\/$/, '')
 
 export const useEmilyDashboard = () => {
   const { user, logout } = useAuth()
+  const { isDarkMode, setIsDarkMode } = useTheme()
   const { showSuccess, showError } = useNotifications()
   const navigate = useNavigate()
   const [profile, setProfile] = useState(null)
@@ -47,13 +20,10 @@ export const useEmilyDashboard = () => {
   const [loadingConversations, setLoadingConversations] = useState(false)
   const [messageFilter, setMessageFilter] = useState('all')
   const [showChatHistory, setShowChatHistory] = useState(false)
-  const [isDarkMode, setIsDarkMode] = useState(getDarkModePreference)
   const [isMobileView, setIsMobileView] = useState(window.innerWidth < 768)
   const [overdueLeadsCount, setOverdueLeadsCount] = useState(0)
   const [overdueLeadsLoading, setOverdueLeadsLoading] = useState(true)
   const hasSetInitialDate = useRef(false)
-
-  useStorageListener('darkMode', setIsDarkMode)
 
   useEffect(() => {
     const handleResize = () => {
@@ -134,15 +104,6 @@ export const useEmilyDashboard = () => {
       hasSetInitialDate.current = true
     }
   }, [conversations])
-
-  useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-    }
-    localStorage.setItem('darkMode', isDarkMode.toString())
-  }, [isDarkMode])
 
   const getAuthToken = async () => {
     const { data: { session } } = await supabase.auth.getSession()

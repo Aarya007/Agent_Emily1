@@ -25,6 +25,7 @@ import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { NotificationProvider, useNotifications } from './contexts/NotificationContext'
 import { ContentCacheProvider } from './contexts/ContentCacheContext'
 import { SocialMediaCacheProvider } from './contexts/SocialMediaCacheContext'
+import { ThemeProvider } from './contexts/ThemeContext'
 import { onboardingAPI } from './services/onboarding'
 import NotificationWindow from './components/NotificationWindow'
 //  Components
@@ -306,15 +307,17 @@ function App() {
   return (
     <HelmetProvider>
       <ErrorBoundary>
-        <AuthProvider>
-          <NotificationProvider>
-            <ContentCacheProvider>
-              <SocialMediaCacheProvider>
-                <AppContent />
-              </SocialMediaCacheProvider>
-            </ContentCacheProvider>
-          </NotificationProvider>
-        </AuthProvider>
+        <ThemeProvider>
+          <AuthProvider>
+            <NotificationProvider>
+              <ContentCacheProvider>
+                <SocialMediaCacheProvider>
+                  <AppContent />
+                </SocialMediaCacheProvider>
+              </ContentCacheProvider>
+            </NotificationProvider>
+          </AuthProvider>
+        </ThemeProvider>
       </ErrorBoundary>
     </HelmetProvider>
   )

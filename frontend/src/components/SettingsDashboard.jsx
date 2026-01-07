@@ -22,6 +22,7 @@ import {
 } from 'lucide-react'
 import { socialMediaService } from '../services/socialMedia'
 import { connectionsAPI } from '../services/connections'
+import { useTheme } from '../contexts/ThemeContext'
 import ConnectionStatus from './ConnectionStatus'
 import SideNavbar from './SideNavbar'
 import MobileNavigation from './MobileNavigation'
@@ -31,6 +32,7 @@ import WordPressInstructionsModal from './WordPressInstructionsModal'
 // Using URL-based approach for logos
 
 const SettingsDashboard = () => {
+  const { isDarkMode } = useTheme()
   const [connections, setConnections] = useState([])
   const [loading, setLoading] = useState(false)
   const [showConnectionModal, setShowConnectionModal] = useState(false)
@@ -873,7 +875,11 @@ const SettingsDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
+    <div className={`min-h-screen transition-colors duration-300 ${
+      isDarkMode 
+        ? 'bg-gray-950 text-gray-100' 
+        : 'bg-gradient-to-br from-gray-50 via-white to-gray-100 text-gray-900'
+    }`}>
       {/* Side Navbar */}
       <SideNavbar />
       
@@ -883,7 +889,11 @@ const SettingsDashboard = () => {
       {/* Main Content */}
       <div className="flex-1 ml-0 md:ml-48 xl:ml-64 pt-16 md:pt-0">
         {/* Header */}
-        <div className="bg-white/80 backdrop-blur-sm shadow-lg border-b border-gray-200/50">
+        <div className={`backdrop-blur-sm shadow-lg border-b transition-colors duration-300 ${
+          isDarkMode 
+            ? 'bg-gray-900/80 border-gray-800' 
+            : 'bg-white/80 border-gray-200/50'
+        }`}>
           <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
             <div className="flex justify-between items-center py-3 md:py-4 lg:py-8 gap-2 md:gap-3 lg:gap-4">
               <div className="flex items-center space-x-2 md:space-x-3 lg:space-x-4 min-w-0 flex-1 pr-2">
@@ -891,10 +901,16 @@ const SettingsDashboard = () => {
                   <Settings className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-white" />
                 </div>
                 <div className="min-w-0">
-                  <h1 className="text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent truncate">
+                  <h1 className={`text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl font-bold bg-clip-text text-transparent truncate ${
+                    isDarkMode 
+                      ? 'bg-gradient-to-r from-gray-100 to-gray-400' 
+                      : 'bg-gradient-to-r from-gray-900 to-gray-700'
+                  }`}>
                     Settings Dashboard
                   </h1>
-                  <p className="text-gray-600 text-xs sm:text-sm md:text-base lg:text-lg hidden md:block">Connect your social media accounts using OAuth or Access Tokens</p>
+                  <p className={`text-xs sm:text-sm md:text-base lg:text-lg hidden md:block ${
+                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                  }`}>Connect your social media accounts using OAuth or Access Tokens</p>
                 </div>
               </div>
               
@@ -923,14 +939,22 @@ const SettingsDashboard = () => {
 
               {/* Success/Error Messages */}
               {success && (
-                <div className="mb-4 md:mb-6 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 text-green-600 px-3 sm:px-4 py-2 sm:py-3 rounded-md sm:rounded-lg flex items-center">
+                <div className={`mb-4 md:mb-6 border px-3 sm:px-4 py-2 sm:py-3 rounded-md sm:rounded-lg flex items-center ${
+                  isDarkMode 
+                    ? 'bg-green-900/20 border-green-800 text-green-400' 
+                    : 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-200 text-green-600'
+                }`}>
                   <Check className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" />
                   <p className="text-xs sm:text-sm md:text-base">{success}</p>
                 </div>
               )}
 
               {error && (
-                <div className="mb-4 md:mb-6 bg-gradient-to-r from-red-50 to-pink-50 border border-red-200 text-red-600 px-3 sm:px-4 py-2 sm:py-3 rounded-md sm:rounded-lg flex items-center">
+                <div className={`mb-4 md:mb-6 border px-3 sm:px-4 py-2 sm:py-3 rounded-md sm:rounded-lg flex items-center ${
+                  isDarkMode 
+                    ? 'bg-red-900/20 border-red-800 text-red-400' 
+                    : 'bg-gradient-to-r from-red-50 to-pink-50 border-red-200 text-red-600'
+                }`}>
                   <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" />
                   <p className="text-xs sm:text-sm md:text-base">{error}</p>
                 </div>
@@ -938,8 +962,14 @@ const SettingsDashboard = () => {
 
 
               {/* Add New Connection */}
-              <div className="bg-white/70 backdrop-blur-sm rounded-xl md:rounded-2xl shadow-xl border border-gray-200/50 p-4 md:p-6 lg:p-8 mb-6 md:mb-8 hover:shadow-2xl transition-all duration-300">
-                <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-gray-900 mb-3 md:mb-4">Add New Connection</h2>
+              <div className={`backdrop-blur-sm rounded-xl md:rounded-2xl shadow-xl border p-4 md:p-6 lg:p-8 mb-6 md:mb-8 hover:shadow-2xl transition-all duration-300 ${
+                isDarkMode 
+                  ? 'bg-gray-900/70 border-gray-800' 
+                  : 'bg-white/70 border-gray-200/50'
+              }`}>
+                <h2 className={`text-base sm:text-lg md:text-xl lg:text-2xl font-bold mb-3 md:mb-4 ${
+                  isDarkMode ? 'text-gray-100' : 'text-gray-900'
+                }`}>Add New Connection</h2>
                 
                 {platforms.filter(platform => !connections.some(c => c.platform === platform.id)).length > 0 ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
@@ -949,25 +979,41 @@ const SettingsDashboard = () => {
                       const Icon = platform.icon
                       
                       return (
-                        <div key={platform.id} className="group relative bg-white rounded-xl sm:rounded-2xl md:rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-100 hover:border-gray-200">
+                        <div key={platform.id} className={`group relative rounded-xl sm:rounded-2xl md:rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden border ${
+                          isDarkMode 
+                            ? 'bg-gray-800 border-gray-700 hover:border-gray-600' 
+                            : 'bg-white border-gray-100 hover:border-gray-200'
+                        }`}>
                           {/* Card Header */}
                           <div className="relative p-4 sm:p-5 md:p-6 pb-3 sm:pb-4">
                             <div className="flex items-center justify-between mb-3 sm:mb-4">
-                              <div className={`w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 ${platform.id === 'google' || platform.id === 'wordpress' ? 'bg-white' : platform.color} rounded-lg sm:rounded-xl md:rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 flex-shrink-0`}>
+                              <div className={`w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 ${
+                                (platform.id === 'google' || platform.id === 'wordpress') 
+                                  ? isDarkMode ? 'bg-gray-700' : 'bg-white' 
+                                  : platform.color
+                              } rounded-lg sm:rounded-xl md:rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 flex-shrink-0`}>
                                 {typeof Icon === 'string' ? (
                                   <img src={Icon} alt={platform.name} className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7" />
                                 ) : (
-                                  <Icon className={`w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 ${platform.id === 'google' || platform.id === 'wordpress' ? 'text-gray-600' : 'text-white'}`} />
+                                  <Icon className={`w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 ${
+                                    (platform.id === 'google' || platform.id === 'wordpress') 
+                                      ? isDarkMode ? 'text-gray-200' : 'text-gray-600' 
+                                      : 'text-white'
+                                  }`} />
                                 )}
                               </div>
                               <div className="flex space-x-1">
-                                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gray-300 rounded-full group-hover:bg-gray-400 transition-colors"></div>
-                                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gray-300 rounded-full group-hover:bg-gray-400 transition-colors"></div>
-                                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gray-300 rounded-full group-hover:bg-gray-400 transition-colors"></div>
+                                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gray-300 dark:bg-gray-600 rounded-full group-hover:bg-gray-400 dark:group-hover:bg-gray-500 transition-colors"></div>
+                                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gray-300 dark:bg-gray-600 rounded-full group-hover:bg-gray-400 dark:group-hover:bg-gray-500 transition-colors"></div>
+                                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gray-300 dark:bg-gray-600 rounded-full group-hover:bg-gray-400 dark:group-hover:bg-gray-500 transition-colors"></div>
                               </div>
                             </div>
-                            <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 mb-1.5 sm:mb-2 group-hover:text-gray-700 transition-colors">{platform.name}</h3>
-                            <p className="text-gray-600 text-xs sm:text-sm leading-relaxed">{platform.description}</p>
+                            <h3 className={`text-base sm:text-lg md:text-xl font-bold mb-1.5 sm:mb-2 group-hover:text-pink-500 transition-colors ${
+                              isDarkMode ? 'text-gray-100' : 'text-gray-900'
+                            }`}>{platform.name}</h3>
+                            <p className={`text-xs sm:text-sm leading-relaxed ${
+                              isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                            }`}>{platform.description}</p>
                           </div>
 
                           {/* Card Body */}
@@ -1023,24 +1069,33 @@ const SettingsDashboard = () => {
 
               {/* Connected Accounts */}
               <div className="mb-6 md:mb-8">
-                <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-gray-900 mb-3 md:mb-4">Connected Accounts</h2>
+                <h2 className={`text-base sm:text-lg md:text-xl lg:text-2xl font-bold mb-3 md:mb-4 ${
+                  isDarkMode ? 'text-gray-100' : 'text-gray-900'
+                }`}>Connected Accounts</h2>
                 {connections.length > 0 ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
                     {connections.map((connection) => (
                       <ConnectionStatus
                         key={connection.id}
                         connection={connection}
+                        isDarkMode={isDarkMode}
                         onDisconnect={(connectionId) => handleDisconnect(connectionId, connection.platform)}
                       />
                     ))}
                   </div>
                 ) : (
                   <div className="text-center py-6 md:py-8">
-                    <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
-                      <Settings className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" />
+                    <div className={`w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4 ${
+                      isDarkMode ? 'bg-gray-800' : 'bg-gray-100'
+                    }`}>
+                      <Settings className={`w-6 h-6 sm:w-8 sm:h-8 ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`} />
                     </div>
-                    <h3 className="text-base sm:text-lg md:text-xl font-medium text-gray-900 mb-2">No connections yet</h3>
-                    <p className="text-xs sm:text-sm md:text-base text-gray-500 px-4">Connect your social media accounts to get started</p>
+                    <h3 className={`text-base sm:text-lg md:text-xl font-medium mb-2 ${
+                      isDarkMode ? 'text-gray-200' : 'text-gray-900'
+                    }`}>No connections yet</h3>
+                    <p className={`text-xs sm:text-sm md:text-base px-4 ${
+                      isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                    }`}>Connect your social media accounts to get started</p>
                   </div>
                 )}
               </div>
@@ -1050,12 +1105,16 @@ const SettingsDashboard = () => {
 
       {/* Connection Modal */}
       {showConnectionModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-3 sm:p-4">
-          <div className="bg-white rounded-lg sm:rounded-xl shadow-xl max-w-md w-full p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-3 sm:p-4">
+          <div className={`rounded-lg sm:rounded-xl shadow-2xl max-w-md w-full p-4 sm:p-6 max-h-[90vh] overflow-y-auto border transition-colors duration-300 ${
+            isDarkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'
+          }`}>
             <div className="mb-4 sm:mb-6">
               {selectedPlatform === 'wordpress' && (
                 <div className="flex justify-center mb-3 sm:mb-4">
-                  <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white rounded-lg sm:rounded-xl flex items-center justify-center shadow-xl border border-gray-200 hover:scale-105 transition-transform duration-300">
+                  <div className={`w-12 h-12 sm:w-16 sm:h-16 rounded-lg sm:rounded-xl flex items-center justify-center shadow-xl border hover:scale-105 transition-transform duration-300 ${
+                    isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+                  }`}>
                     <img 
                       src="https://logo.svgcdn.com/d/wordpress-original.svg" 
                       alt="WordPress" 
@@ -1066,7 +1125,9 @@ const SettingsDashboard = () => {
               )}
               
               <div className="flex justify-center">
-                <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800 text-center px-2">
+                <h3 className={`text-base sm:text-lg md:text-xl font-bold text-center px-2 ${
+                  isDarkMode ? 'text-gray-100' : 'text-gray-800'
+                }`}>
                   {selectedPlatform === 'wordpress' 
                     ? 'Connect Your WordPress Site'
                     : `Connect ${getPlatformInfo(selectedPlatform).name} with Access Token`
@@ -1078,7 +1139,9 @@ const SettingsDashboard = () => {
             {selectedPlatform === 'wordpress' ? (
               <form onSubmit={handleWordPressConnect} className="space-y-3 sm:space-y-4">
                 <div>
-                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">
+                  <label className={`block text-xs sm:text-sm font-medium mb-1.5 sm:mb-2 ${
+                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
                     Site Name
                   </label>
                   <input
@@ -1090,8 +1153,10 @@ const SettingsDashboard = () => {
                     }}
                     placeholder="My WordPress Site"
                     className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm border rounded-md sm:rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-colors ${
-                      wordpressErrors.siteName ? 'border-red-500' : 'border-gray-300'
-                    }`}
+                      isDarkMode 
+                        ? 'bg-gray-800 border-gray-700 text-gray-100 placeholder-gray-500' 
+                        : 'bg-white border-gray-300 text-gray-900'
+                    } ${wordpressErrors.siteName ? 'border-red-500' : ''}`}
                     required
                   />
                   {wordpressErrors.siteName && (
@@ -1103,7 +1168,9 @@ const SettingsDashboard = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">
+                  <label className={`block text-xs sm:text-sm font-medium mb-1.5 sm:mb-2 ${
+                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
                     Site URL
                   </label>
                   <input
@@ -1115,8 +1182,10 @@ const SettingsDashboard = () => {
                     }}
                     placeholder="https://yoursite.com"
                     className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm border rounded-md sm:rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-colors ${
-                      wordpressErrors.siteUrl ? 'border-red-500' : 'border-gray-300'
-                    }`}
+                      isDarkMode 
+                        ? 'bg-gray-800 border-gray-700 text-gray-100 placeholder-gray-500' 
+                        : 'bg-white border-gray-300 text-gray-900'
+                    } ${wordpressErrors.siteUrl ? 'border-red-500' : ''}`}
                     required
                   />
                   {wordpressErrors.siteUrl && (
@@ -1128,7 +1197,9 @@ const SettingsDashboard = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">
+                  <label className={`block text-xs sm:text-sm font-medium mb-1.5 sm:mb-2 ${
+                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
                     Username
                   </label>
                   <input
@@ -1140,8 +1211,10 @@ const SettingsDashboard = () => {
                     }}
                     placeholder="your_username"
                     className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm border rounded-md sm:rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-colors ${
-                      wordpressErrors.username ? 'border-red-500' : 'border-gray-300'
-                    }`}
+                      isDarkMode 
+                        ? 'bg-gray-800 border-gray-700 text-gray-100 placeholder-gray-500' 
+                        : 'bg-white border-gray-300 text-gray-900'
+                    } ${wordpressErrors.username ? 'border-red-500' : ''}`}
                     required
                   />
                   {wordpressErrors.username && (
@@ -1153,7 +1226,9 @@ const SettingsDashboard = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">
+                  <label className={`block text-xs sm:text-sm font-medium mb-1.5 sm:mb-2 ${
+                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
                     App Password
                   </label>
                   <input
@@ -1165,8 +1240,10 @@ const SettingsDashboard = () => {
                     }}
                     placeholder="Enter your WordPress App Password"
                     className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm border rounded-md sm:rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-colors ${
-                      wordpressErrors.password ? 'border-red-500' : 'border-gray-300'
-                    }`}
+                      isDarkMode 
+                        ? 'bg-gray-800 border-gray-700 text-gray-100 placeholder-gray-500' 
+                        : 'bg-white border-gray-300 text-gray-900'
+                    } ${wordpressErrors.password ? 'border-red-500' : ''}`}
                     required
                   />
                   {wordpressErrors.password && (
@@ -1175,16 +1252,22 @@ const SettingsDashboard = () => {
                       <span>{wordpressErrors.password}</span>
                     </p>
                   )}
-                  <p className="text-[10px] sm:text-xs text-gray-500 mt-1 leading-relaxed">
+                  <p className={`text-[10px] sm:text-xs mt-1 leading-relaxed ${
+                    isDarkMode ? 'text-gray-500' : 'text-gray-500'
+                  }`}>
                     Enter your WordPress App Password for API access. Generate one in WordPress Admin → Users → Profile → Application Passwords.
                   </p>
                 </div>
 
-                <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
+                <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 pt-2">
                   <button
                     type="button"
                     onClick={closeModal}
-                    className="flex-1 px-3 sm:px-4 py-2 sm:py-2.5 border border-gray-300 text-gray-700 rounded-md sm:rounded-lg hover:bg-gray-50 transition-colors text-xs sm:text-sm md:text-base font-medium"
+                    className={`flex-1 px-3 sm:px-4 py-2 sm:py-2.5 border rounded-md sm:rounded-lg transition-colors text-xs sm:text-sm md:text-base font-medium ${
+                      isDarkMode 
+                        ? 'border-gray-700 text-gray-300 hover:bg-gray-800' 
+                        : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                    }`}
                   >
                     Cancel
                   </button>
@@ -1207,7 +1290,9 @@ const SettingsDashboard = () => {
             ) : (
               <form onSubmit={handleTokenConnect} className="space-y-3 sm:space-y-4">
                 <div>
-                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">
+                  <label className={`block text-xs sm:text-sm font-medium mb-1.5 sm:mb-2 ${
+                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
                     Access Token
                   </label>
                   <input
@@ -1215,16 +1300,22 @@ const SettingsDashboard = () => {
                     value={accessToken}
                     onChange={(e) => setAccessToken(e.target.value)}
                     placeholder="Enter your access token"
-                    className="w-full px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm border border-gray-300 rounded-md sm:rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm border rounded-md sm:rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
+                      isDarkMode 
+                        ? 'bg-gray-800 border-gray-700 text-gray-100 placeholder-gray-500' 
+                        : 'bg-white border-gray-300 text-gray-900'
+                    }`}
                     required
                   />
-                  <p className="text-[10px] sm:text-xs text-gray-500 mt-1 leading-relaxed">
+                  <p className={`text-[10px] sm:text-xs mt-1 leading-relaxed ${
+                    isDarkMode ? 'text-gray-500' : 'text-gray-500'
+                  }`}>
                     Get your access token from{' '}
                     <a
                       href={getPlatformInfo(selectedPlatform).helpUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline inline-flex items-center"
+                      className="text-blue-500 hover:text-blue-400 hover:underline inline-flex items-center"
                     >
                       {getPlatformInfo(selectedPlatform).name} Developer Tools
                       <ExternalLink className="w-3 h-3 ml-1 flex-shrink-0" />
@@ -1232,23 +1323,29 @@ const SettingsDashboard = () => {
                   </p>
                 </div>
 
-                <div className="space-y-2 sm:space-y-3">
+                <div className="space-y-2 sm:space-y-3 pt-2">
                   <div className="flex space-x-2">
                     <button
                       type="button"
                       onClick={handleDebugToken}
                       disabled={loading || !accessToken}
-                      className="px-3 sm:px-4 py-2 sm:py-2.5 bg-gray-600 text-white text-xs sm:text-sm rounded-md sm:rounded-lg hover:bg-gray-700 disabled:opacity-50 transition-colors whitespace-nowrap"
+                      className={`px-3 sm:px-4 py-2 sm:py-2.5 text-white text-xs sm:text-sm rounded-md sm:rounded-lg disabled:opacity-50 transition-colors whitespace-nowrap ${
+                        isDarkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-600 hover:bg-gray-700'
+                      }`}
                     >
                       Debug Token
                     </button>
                   </div>
                   
-                  <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
+                  <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 pt-2">
                     <button
                       type="button"
                       onClick={closeModal}
-                      className="flex-1 px-3 sm:px-4 py-2 sm:py-2.5 border border-gray-300 text-gray-700 rounded-md sm:rounded-lg hover:bg-gray-50 transition-colors text-xs sm:text-sm md:text-base font-medium"
+                      className={`flex-1 px-3 sm:px-4 py-2 sm:py-2.5 border rounded-md sm:rounded-lg transition-colors text-xs sm:text-sm md:text-base font-medium ${
+                        isDarkMode 
+                          ? 'border-gray-700 text-gray-300 hover:bg-gray-800' 
+                          : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                      }`}
                     >
                       Cancel
                     </button>

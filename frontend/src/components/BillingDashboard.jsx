@@ -1,5 +1,6 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { subscriptionAPI } from '../services/subscription';
 import { trialAPI } from '../services/trial';
 import { generateInvoicePDF, generateBillingHistoryPDF } from '../services/pdfGenerator';
@@ -22,6 +23,7 @@ import {
 
 const BillingDashboard = () => {
   const { user } = useAuth();
+  const { isDarkMode } = useTheme();
   const [subscriptionStatus, setSubscriptionStatus] = useState(null);
   const [billingHistory, setBillingHistory] = useState([]);
   const [userProfile, setUserProfile] = useState(null);
@@ -332,7 +334,11 @@ const BillingDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
+    <div className={`min-h-screen transition-colors duration-300 ${
+      isDarkMode 
+        ? 'bg-gray-950 text-gray-100' 
+        : 'bg-gradient-to-br from-gray-50 via-white to-gray-100 text-gray-900'
+    }`}>
       {/* Side Navbar */}
       <SideNavbar />
       
@@ -342,7 +348,11 @@ const BillingDashboard = () => {
       {/* Main Content */}
       <div className="flex-1 ml-0 md:ml-48 xl:ml-64 pt-16 md:pt-0">
         {/* Header */}
-        <div className="bg-white/80 backdrop-blur-sm shadow-lg border-b border-gray-200/50">
+        <div className={`backdrop-blur-sm shadow-lg border-b transition-colors duration-300 ${
+          isDarkMode 
+            ? 'bg-gray-900/80 border-gray-800' 
+            : 'bg-white/80 border-gray-200/50'
+        }`}>
           <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
             <div className="flex justify-between items-center py-3 md:py-4 lg:py-8 gap-2 md:gap-3 lg:gap-4">
               <div className="flex items-center space-x-2 md:space-x-3 lg:space-x-4 min-w-0 flex-1 pr-2">
@@ -350,10 +360,14 @@ const BillingDashboard = () => {
                   <CreditCard className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-white" />
                 </div>
                 <div className="min-w-0">
-                  <h1 className="text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl font-normal text-white truncate">
+                  <h1 className={`text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl font-normal truncate ${
+                    isDarkMode ? 'text-gray-100' : 'text-gray-900'
+                  }`}>
                     Billing & Subscription
                   </h1>
-                  <p className="text-gray-600 text-xs sm:text-sm md:text-base lg:text-lg hidden md:block">Manage your subscription and view billing history</p>
+                  <p className={`text-xs sm:text-sm md:text-base lg:text-lg hidden md:block ${
+                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                  }`}>Manage your subscription and view billing history</p>
                 </div>
               </div>
               
@@ -374,20 +388,30 @@ const BillingDashboard = () => {
         {/* Main Content */}
         <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 md:py-8">
           {error && (
-            <div className="mb-4 md:mb-6 p-3 sm:p-4 bg-gradient-to-r from-red-50 to-pink-50 border border-red-200 rounded-lg sm:rounded-xl">
+            <div className={`mb-4 md:mb-6 p-3 sm:p-4 border rounded-lg sm:rounded-xl ${
+              isDarkMode ? 'bg-red-900/20 border-red-800' : 'bg-gradient-to-r from-red-50 to-pink-50 border-red-200'
+            }`}>
               <div className="flex items-center">
                 <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-500 mr-2 flex-shrink-0" />
-                <p className="text-red-700 text-xs sm:text-sm md:text-base">{error}</p>
+                <p className={`${isDarkMode ? 'text-red-400' : 'text-red-700'} text-xs sm:text-sm md:text-base`}>{error}</p>
               </div>
             </div>
           )}
 
           <div className="space-y-4 md:space-y-6 lg:space-y-8">
              {/* Current Subscription Card */}
-             <div className="bg-white/70 backdrop-blur-sm rounded-xl md:rounded-2xl shadow-xl border border-gray-200/50 p-4 md:p-6 lg:p-8 hover:shadow-2xl transition-all duration-300">
+             <div className={`backdrop-blur-sm rounded-xl md:rounded-2xl shadow-xl border p-4 md:p-6 lg:p-8 hover:shadow-2xl transition-all duration-300 ${
+               isDarkMode ? 'bg-gray-900/70 border-gray-800' : 'bg-white/70 border-gray-200/50'
+             }`}>
                <div className="flex items-center justify-between mb-4 md:mb-6 gap-2 sm:gap-3 md:gap-4">
-                 <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl font-normal text-white flex-1 min-w-0">Current Subscription</h2>
-                 <div className={`flex items-center space-x-1.5 sm:space-x-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium flex-shrink-0 whitespace-nowrap ${getStatusColor(subscriptionStatus?.status || 'inactive')}`}>
+                 <h2 className={`text-base sm:text-lg md:text-xl lg:text-2xl font-normal flex-1 min-w-0 ${
+                   isDarkMode ? 'text-gray-100' : 'text-gray-900'
+                 }`}>Current Subscription</h2>
+                 <div className={`flex items-center space-x-1.5 sm:space-x-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium flex-shrink-0 whitespace-nowrap ${
+                   isDarkMode && subscriptionStatus?.status === 'active' 
+                     ? 'text-green-400 bg-green-900/30' 
+                     : getStatusColor(subscriptionStatus?.status || 'inactive')
+                 }`}>
                    {getStatusIcon(subscriptionStatus?.status || 'inactive')}
                    <span className="capitalize">{subscriptionStatus?.status || 'Inactive'}</span>
                  </div>
@@ -396,21 +420,27 @@ const BillingDashboard = () => {
                {subscriptionStatus?.has_active_subscription ? (
                  <div className="flex items-center gap-2 sm:gap-3 md:gap-4 lg:gap-6 overflow-x-auto">
                    <div className="space-y-1 sm:space-y-1.5 flex-shrink-0 min-w-[60px] sm:min-w-[80px] md:min-w-[100px]">
-                     <p className="text-xs sm:text-sm text-gray-500 whitespace-nowrap">Plan</p>
-                     <p className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl font-semibold text-gray-900 capitalize truncate">{subscriptionStatus?.plan || 'N/A'}</p>
+                     <p className={`text-xs sm:text-sm whitespace-nowrap ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Plan</p>
+                     <p className={`text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl font-semibold capitalize truncate ${
+                       isDarkMode ? 'text-gray-100' : 'text-gray-900'
+                     }`}>{subscriptionStatus?.plan || 'N/A'}</p>
                    </div>
                    
                    <div className="space-y-1 sm:space-y-1.5 flex-shrink-0 min-w-[70px] sm:min-w-[90px] md:min-w-[110px]">
-                     <p className="text-xs sm:text-sm text-gray-500 whitespace-nowrap">Started</p>
-                     <p className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl font-semibold text-gray-900 truncate">
+                     <p className={`text-xs sm:text-sm whitespace-nowrap ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Started</p>
+                     <p className={`text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl font-semibold truncate ${
+                       isDarkMode ? 'text-gray-100' : 'text-gray-900'
+                     }`}>
                        {subscriptionStatus?.subscription_start_date ? 
                          formatDate(subscriptionStatus.subscription_start_date) : 'N/A'}
                      </p>
                    </div>
                    
                    <div className="space-y-1 sm:space-y-1.5 flex-shrink-0 min-w-[80px] sm:min-w-[100px] md:min-w-[120px]">
-                     <p className="text-xs sm:text-sm text-gray-500 whitespace-nowrap">Next Payment</p>
-                     <p className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl font-semibold text-gray-900 truncate">
+                     <p className={`text-xs sm:text-sm whitespace-nowrap ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Next Payment</p>
+                     <p className={`text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl font-semibold truncate ${
+                       isDarkMode ? 'text-gray-100' : 'text-gray-900'
+                     }`}>
                        {subscriptionStatus?.subscription_start_date ? 
                          formatDate(calculateNextPayment(subscriptionStatus.subscription_start_date, 'monthly')) : 'N/A'}
                      </p>
@@ -418,9 +448,15 @@ const BillingDashboard = () => {
                  </div>
               ) : (
                 <div className="text-center py-6 md:py-8">
-                  <CreditCard className="w-12 h-12 sm:w-16 sm:h-16 text-gray-300 mx-auto mb-3 md:mb-4" />
-                  <h3 className="text-base sm:text-lg md:text-xl font-normal text-white mb-2">No Active Subscription</h3>
-                  <p className="text-xs sm:text-sm md:text-base text-gray-500 mb-4 px-4">You don't have an active subscription. Choose a plan to get started.</p>
+                  <CreditCard className={`w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 md:mb-4 ${
+                    isDarkMode ? 'text-gray-700' : 'text-gray-300'
+                  }`} />
+                  <h3 className={`text-base sm:text-lg md:text-xl font-normal mb-2 ${
+                    isDarkMode ? 'text-gray-200' : 'text-gray-900'
+                  }`}>No Active Subscription</h3>
+                  <p className={`text-xs sm:text-sm md:text-base mb-4 px-4 ${
+                    isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                  }`}>You don't have an active subscription. Choose a plan to get started.</p>
                   <button
                     onClick={() => window.location.href = '/subscription'}
                     className="inline-flex items-center px-4 sm:px-6 py-2 sm:py-2.5 bg-gradient-to-r from-purple-500 to-indigo-600 text-white rounded-md sm:rounded-lg md:rounded-xl hover:from-indigo-600 hover:to-purple-500 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-xs sm:text-sm md:text-base font-medium"
@@ -434,15 +470,19 @@ const BillingDashboard = () => {
 
             {/* Trial Status Card */}
             {trialInfo && (
-              <div className="bg-white/70 backdrop-blur-sm rounded-xl md:rounded-2xl shadow-xl border border-gray-200/50 p-4 md:p-6 lg:p-8 hover:shadow-2xl transition-all duration-300">
+              <div className={`backdrop-blur-sm rounded-xl md:rounded-2xl shadow-xl border p-4 md:p-6 lg:p-8 hover:shadow-2xl transition-all duration-300 ${
+                isDarkMode ? 'bg-gray-900/70 border-gray-800' : 'bg-white/70 border-gray-200/50'
+              }`}>
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 md:mb-6 gap-3 sm:gap-0">
-                  <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl font-normal text-white">Trial Status</h2>
+                  <h2 className={`text-base sm:text-lg md:text-xl lg:text-2xl font-normal ${
+                    isDarkMode ? 'text-gray-100' : 'text-gray-900'
+                  }`}>Trial Status</h2>
                   <div className={`flex items-center space-x-1.5 sm:space-x-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium ${
                     trialInfo.trial_active 
-                      ? 'bg-blue-100 text-blue-800' 
+                      ? isDarkMode ? 'bg-blue-900/30 text-blue-400' : 'bg-blue-100 text-blue-800' 
                       : trialInfo.subscription_status === 'expired'
-                      ? 'bg-orange-100 text-orange-800'
-                      : 'bg-gray-100 text-gray-800'
+                      ? isDarkMode ? 'bg-orange-900/30 text-orange-400' : 'bg-orange-100 text-orange-800'
+                      : isDarkMode ? 'bg-gray-800 text-gray-400' : 'bg-gray-100 text-gray-800'
                   }`}>
                     <Gift className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     <span className="capitalize">
@@ -455,27 +495,41 @@ const BillingDashboard = () => {
 
                 {trialInfo.trial_active ? (
                   <div className="space-y-3 md:space-y-4">
-                    <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg sm:rounded-xl p-3 sm:p-4">
+                    <div className={`border rounded-lg sm:rounded-xl p-3 sm:p-4 ${
+                      isDarkMode 
+                        ? 'bg-gradient-to-r from-blue-900/20 to-purple-900/20 border-blue-800/50' 
+                        : 'bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200'
+                    }`}>
                       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
                         <div className="flex-1">
-                          <h3 className="text-base sm:text-lg md:text-xl font-normal text-white mb-1 sm:mb-2">🎉 Free Trial Active</h3>
-                          <p className="text-xs sm:text-sm md:text-base text-gray-600">
-                            You have <span className="font-semibold text-blue-600">{trialInfo.days_remaining}</span> days remaining
+                          <h3 className={`text-base sm:text-lg md:text-xl font-normal mb-1 sm:mb-2 ${
+                            isDarkMode ? 'text-blue-300' : 'text-blue-800'
+                          }`}>🎉 Free Trial Active</h3>
+                          <p className={`text-xs sm:text-sm md:text-base ${
+                            isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                          }`}>
+                            You have <span className="font-semibold text-blue-500">{trialInfo.days_remaining}</span> days remaining
                           </p>
                           {trialInfo.trial_expires_at && (
-                            <p className="text-[10px] sm:text-xs text-gray-500 mt-1">
+                            <p className={`text-[10px] sm:text-xs mt-1 ${
+                              isDarkMode ? 'text-gray-500' : 'text-gray-500'
+                            }`}>
                               Expires on {new Date(trialInfo.trial_expires_at).toLocaleDateString()}
                             </p>
                           )}
                         </div>
-                        <div className="flex items-center space-x-2 text-blue-600 flex-shrink-0">
+                        <div className={`flex items-center space-x-2 flex-shrink-0 ${
+                          isDarkMode ? 'text-blue-400' : 'text-blue-600'
+                        }`}>
                           <Clock className="w-4 h-4 sm:w-5 sm:h-5" />
                         </div>
                       </div>
                     </div>
                     
                     <div className="text-center">
-                      <p className="text-xs sm:text-sm md:text-base text-gray-600 mb-3 px-2">
+                      <p className={`text-xs sm:text-sm md:text-base mb-3 px-2 ${
+                        isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                      }`}>
                         Enjoy full access to all Emily features during your trial
                       </p>
                       <button
@@ -488,9 +542,15 @@ const BillingDashboard = () => {
                   </div>
                 ) : trialInfo.subscription_status === 'expired' ? (
                   <div className="text-center py-4 md:py-6">
-                    <Clock className="w-12 h-12 sm:w-16 sm:h-16 text-orange-400 mx-auto mb-3 md:mb-4" />
-                    <h3 className="text-base sm:text-lg md:text-xl font-normal text-white mb-2">Trial Expired</h3>
-                    <p className="text-xs sm:text-sm md:text-base text-gray-500 mb-4 px-4">Your free trial has ended. Choose a plan to continue using Emily.</p>
+                    <Clock className={`w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 md:mb-4 ${
+                      isDarkMode ? 'text-orange-900/50' : 'text-orange-400'
+                    }`} />
+                    <h3 className={`text-base sm:text-lg md:text-xl font-normal mb-2 ${
+                      isDarkMode ? 'text-gray-200' : 'text-gray-900'
+                    }`}>Trial Expired</h3>
+                    <p className={`text-xs sm:text-sm md:text-base mb-4 px-4 ${
+                      isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                    }`}>Your free trial has ended. Choose a plan to continue using Emily.</p>
                     <button
                       onClick={() => window.location.href = '/subscription'}
                       className="inline-flex items-center px-4 sm:px-6 py-2 sm:py-2.5 bg-gradient-to-r from-purple-500 to-indigo-600 text-white rounded-md sm:rounded-lg md:rounded-xl hover:from-indigo-600 hover:to-purple-500 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-xs sm:text-sm md:text-base font-medium"
@@ -501,19 +561,31 @@ const BillingDashboard = () => {
                   </div>
                 ) : (
                   <div className="text-center py-4 md:py-6">
-                    <Gift className="w-12 h-12 sm:w-16 sm:h-16 text-gray-300 mx-auto mb-3 md:mb-4" />
-                    <h3 className="text-base sm:text-lg md:text-xl font-normal text-white mb-2">No Trial Available</h3>
-                    <p className="text-xs sm:text-sm md:text-base text-gray-500 mb-4 px-4">You have already used your free trial or have an active subscription.</p>
+                    <Gift className={`w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 md:mb-4 ${
+                      isDarkMode ? 'text-gray-800' : 'text-gray-300'
+                    }`} />
+                    <h3 className={`text-base sm:text-lg md:text-xl font-normal mb-2 ${
+                      isDarkMode ? 'text-gray-300' : 'text-gray-900'
+                    }`}>No Trial Available</h3>
+                    <p className={`text-xs sm:text-sm md:text-base px-4 ${
+                      isDarkMode ? 'text-gray-500' : 'text-gray-500'
+                    }`}>You have already used your free trial or have an active subscription.</p>
                   </div>
                 )}
               </div>
             )}
-             <div className="bg-white/70 backdrop-blur-sm rounded-xl md:rounded-2xl shadow-xl border border-gray-200/50 p-4 md:p-6 lg:p-8 hover:shadow-2xl transition-all duration-300">
+             <div className={`backdrop-blur-sm rounded-xl md:rounded-2xl shadow-xl border p-4 md:p-6 lg:p-8 hover:shadow-2xl transition-all duration-300 ${
+               isDarkMode ? 'bg-gray-900/70 border-gray-800' : 'bg-white/70 border-gray-200/50'
+             }`}>
                <div className="flex items-center justify-between mb-4 md:mb-6 gap-2 sm:gap-3 md:gap-4">
-                 <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl font-normal text-white flex-1 min-w-0">Billing History</h2>
+                 <h2 className={`text-base sm:text-lg md:text-xl lg:text-2xl font-normal flex-1 min-w-0 ${
+                   isDarkMode ? 'text-gray-100' : 'text-gray-900'
+                 }`}>Billing History</h2>
                  <button 
                    onClick={handleExportBilling}
-                   className="flex items-center space-x-1.5 sm:space-x-2 px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 text-gray-600 hover:text-gray-900 transition-colors rounded-md sm:rounded-lg text-xs sm:text-sm md:text-base font-medium whitespace-nowrap flex-shrink-0"
+                   className={`flex items-center space-x-1.5 sm:space-x-2 px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 transition-colors rounded-md sm:rounded-lg text-xs sm:text-sm md:text-base font-medium whitespace-nowrap flex-shrink-0 ${
+                     isDarkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-600 hover:text-gray-900'
+                   }`}
                  >
                    <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                    <span className="hidden sm:inline">Export PDF</span>
@@ -524,31 +596,47 @@ const BillingDashboard = () => {
               {billingHistory.length > 0 ? (
                 <div className="space-y-3 md:space-y-4">
                   {billingHistory.map((invoice) => (
-                    <div key={invoice.id} className="flex flex-col lg:flex-row lg:items-center justify-between p-3 sm:p-4 bg-gray-50 rounded-lg sm:rounded-xl hover:bg-gray-100 transition-colors gap-3 lg:gap-4">
+                    <div key={invoice.id} className={`flex flex-col lg:flex-row lg:items-center justify-between p-3 sm:p-4 rounded-lg sm:rounded-xl transition-colors gap-3 lg:gap-4 ${
+                      isDarkMode ? 'bg-gray-800 hover:bg-gray-750' : 'bg-gray-50 hover:bg-gray-100'
+                    }`}>
                       <div className="flex items-start sm:items-center space-x-2 sm:space-x-3 md:space-x-4 flex-1 min-w-0">
                         <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 sm:mt-0">
                           <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                         </div>
                         <div className="min-w-0 flex-1 pr-2">
-                          <p className="font-medium text-gray-900 text-xs sm:text-sm md:text-base break-words">{invoice.description}</p>
-                          <p className="text-xs sm:text-sm text-gray-500 break-all mt-0.5">Invoice #{invoice.id}</p>
+                          <p className={`font-medium text-xs sm:text-sm md:text-base break-words ${
+                            isDarkMode ? 'text-gray-100' : 'text-gray-900'
+                          }`}>{invoice.description}</p>
+                          <p className={`text-xs sm:text-sm break-all mt-0.5 ${
+                            isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                          }`}>Invoice #{invoice.id}</p>
                         </div>
                       </div>
                       
                        <div className="flex items-center gap-2 sm:gap-3 lg:gap-4 flex-shrink-0 flex-wrap">
                          <div className="text-left lg:text-right min-w-[70px] sm:min-w-[80px] lg:min-w-[120px]">
-                           <p className="font-semibold text-gray-900 text-xs sm:text-sm md:text-base whitespace-nowrap">{formatCurrency(invoice.amount)}</p>
-                           <p className="text-xs sm:text-sm text-gray-500 whitespace-nowrap hidden lg:block">{formatDate(invoice.date)}</p>
+                           <p className={`font-semibold text-xs sm:text-sm md:text-base whitespace-nowrap ${
+                             isDarkMode ? 'text-gray-100' : 'text-gray-900'
+                           }`}>{formatCurrency(invoice.amount)}</p>
+                           <p className={`text-xs sm:text-sm whitespace-nowrap hidden lg:block ${
+                             isDarkMode ? 'text-gray-500' : 'text-gray-500'
+                           }`}>{formatDate(invoice.date)}</p>
                          </div>
                          
-                         <div className={`flex items-center space-x-1.5 sm:space-x-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap flex-shrink-0 ${getStatusColor(invoice.status)}`}>
+                         <div className={`flex items-center space-x-1.5 sm:space-x-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap flex-shrink-0 ${
+                           isDarkMode && invoice.status === 'paid'
+                             ? 'text-green-400 bg-green-900/30'
+                             : getStatusColor(invoice.status)
+                         }`}>
                            {getStatusIcon(invoice.status)}
                            <span className="capitalize">{invoice.status}</span>
                          </div>
                          
                          <button 
                            onClick={() => handleDownloadInvoice(invoice)}
-                           className="flex items-center justify-center space-x-1 sm:space-x-1.5 px-2 sm:px-3 py-1 sm:py-1.5 text-gray-600 hover:text-gray-900 transition-colors text-xs sm:text-sm rounded-md sm:rounded-lg whitespace-nowrap flex-shrink-0"
+                           className={`flex items-center justify-center space-x-1 sm:space-x-1.5 px-2 sm:px-3 py-1 sm:py-1.5 transition-colors text-xs sm:text-sm rounded-md sm:rounded-lg whitespace-nowrap flex-shrink-0 ${
+                             isDarkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-600 hover:text-gray-900'
+                           }`}
                          >
                            <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                            <span className="hidden sm:inline">Download</span>
@@ -559,29 +647,45 @@ const BillingDashboard = () => {
                 </div>
               ) : (
                 <div className="text-center py-6 md:py-8">
-                  <FileText className="w-12 h-12 sm:w-16 sm:h-16 text-gray-300 mx-auto mb-3 md:mb-4" />
-                  <h3 className="text-base sm:text-lg md:text-xl font-normal text-white mb-2">No Billing History</h3>
-                  <p className="text-xs sm:text-sm md:text-base text-gray-500 px-4">Your billing history will appear here once you make your first payment.</p>
+                  <FileText className={`w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 md:mb-4 ${
+                    isDarkMode ? 'text-gray-800' : 'text-gray-300'
+                  }`} />
+                  <h3 className={`text-base sm:text-lg md:text-xl font-normal mb-2 ${
+                    isDarkMode ? 'text-gray-200' : 'text-gray-900'
+                  }`}>No Billing History</h3>
+                  <p className={`text-xs sm:text-sm md:text-base px-4 ${
+                    isDarkMode ? 'text-gray-500' : 'text-gray-500'
+                  }`}>Your billing history will appear here once you make your first payment.</p>
                 </div>
               )}
             </div>
 
              {/* Payment Method */}
-             <div className="bg-white/70 backdrop-blur-sm rounded-xl md:rounded-2xl shadow-xl border border-gray-200/50 p-4 md:p-6 lg:p-8 hover:shadow-2xl transition-all duration-300">
-               <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl font-normal text-white mb-3 md:mb-4">Payment Method</h2>
+             <div className={`backdrop-blur-sm rounded-xl md:rounded-2xl shadow-xl border p-4 md:p-6 lg:p-8 hover:shadow-2xl transition-all duration-300 ${
+               isDarkMode ? 'bg-gray-900/70 border-gray-800' : 'bg-white/70 border-gray-200/50'
+             }`}>
+               <h2 className={`text-base sm:text-lg md:text-xl lg:text-2xl font-normal mb-3 md:mb-4 ${
+                 isDarkMode ? 'text-gray-100' : 'text-gray-900'
+               }`}>Payment Method</h2>
                <div className="flex items-center justify-between gap-2 sm:gap-3 md:gap-4">
                  <div className="flex items-center space-x-2 sm:space-x-3 md:space-x-4 flex-1 min-w-0">
                    <div className="w-10 h-7 sm:w-12 sm:h-8 bg-gradient-to-r from-blue-500 to-blue-600 rounded flex items-center justify-center flex-shrink-0">
                      <CreditCard className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" />
                    </div>
                    <div className="min-w-0 pr-2">
-                     <p className="font-medium text-gray-900 text-xs sm:text-sm md:text-base truncate">Razorpay Payment Gateway</p>
-                     <p className="text-xs sm:text-sm text-gray-500 truncate">Secure payment processing</p>
+                     <p className={`font-medium text-xs sm:text-sm md:text-base truncate ${
+                       isDarkMode ? 'text-gray-100' : 'text-gray-900'
+                     }`}>Razorpay Payment Gateway</p>
+                     <p className={`text-xs sm:text-sm truncate ${
+                       isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                     }`}>Secure payment processing</p>
                    </div>
                  </div>
                  <button 
                    onClick={handleUpdatePaymentMethod}
-                   className="px-3 sm:px-4 py-1.5 sm:py-2 text-purple-600 hover:text-purple-700 font-medium transition-colors rounded-md sm:rounded-lg text-xs sm:text-sm md:text-base whitespace-nowrap flex-shrink-0"
+                   className={`px-3 sm:px-4 py-1.5 sm:py-2 font-medium transition-colors rounded-md sm:rounded-lg text-xs sm:text-sm md:text-base whitespace-nowrap flex-shrink-0 ${
+                     isDarkMode ? 'text-purple-400 hover:text-purple-300' : 'text-purple-600 hover:text-purple-700'
+                   }`}
                  >
                    Update
                  </button>
@@ -590,8 +694,12 @@ const BillingDashboard = () => {
 
             {/* Subscription Management */}
             {subscriptionStatus?.has_active_subscription && (
-              <div className="bg-white/70 backdrop-blur-sm rounded-xl md:rounded-2xl shadow-xl border border-gray-200/50 p-4 md:p-6 lg:p-8 hover:shadow-2xl transition-all duration-300">
-                <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl font-normal text-white mb-3 md:mb-4">Subscription Management</h2>
+              <div className={`backdrop-blur-sm rounded-xl md:rounded-2xl shadow-xl border p-4 md:p-6 lg:p-8 hover:shadow-2xl transition-all duration-300 ${
+                isDarkMode ? 'bg-gray-900/70 border-gray-800' : 'bg-white/70 border-gray-200/50'
+              }`}>
+                <h2 className={`text-base sm:text-lg md:text-xl lg:text-2xl font-normal mb-3 md:mb-4 ${
+                  isDarkMode ? 'text-gray-100' : 'text-gray-900'
+                }`}>Subscription Management</h2>
                 <div className="flex items-center space-x-2 sm:space-x-3 md:space-x-4 flex-wrap gap-2">
                   <button 
                     onClick={handleUpgradePlan}
@@ -602,7 +710,11 @@ const BillingDashboard = () => {
                   <button 
                     onClick={handleCancelSubscription}
                     disabled={actionLoading}
-                    className="px-3 sm:px-4 md:px-6 py-2 sm:py-2.5 md:py-3 border border-gray-300 text-gray-700 rounded-md sm:rounded-lg md:rounded-xl hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-sm md:text-base font-medium whitespace-nowrap"
+                    className={`px-3 sm:px-4 md:px-6 py-2 sm:py-2.5 md:py-3 border rounded-md sm:rounded-lg md:rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-sm md:text-base font-medium whitespace-nowrap ${
+                      isDarkMode 
+                        ? 'border-gray-700 text-gray-300 hover:bg-gray-800' 
+                        : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                    }`}
                   >
                     {actionLoading ? (
                       <>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import { useTheme } from '../contexts/ThemeContext'
 import { supabase } from '../lib/supabase'
 import { adminAPI } from '../services/admin'
 import SettingsMenu from './SettingsMenu'
@@ -40,6 +41,7 @@ import {
 
 const SideNavbar = () => {
   const { user, logout } = useAuth()
+  const { isDarkMode } = useTheme()
   const navigate = useNavigate()
   const location = useLocation()
   const [profile, setProfile] = useState(null)
@@ -48,11 +50,6 @@ const SideNavbar = () => {
   const [isSettingsMenuOpen, setIsSettingsMenuOpen] = useState(false)
   const [isAdmin, setIsAdmin] = useState(false)
   const [userPlan, setUserPlan] = useState('')
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    // Check localStorage for saved preference, default to dark mode
-    const saved = localStorage.getItem('darkMode')
-    return saved !== null ? saved === 'true' : true // Default to true (dark mode)
-  })
 
   // Cache key for localStorage
   const getCacheKey = (userId) => `profile_${userId}`
@@ -240,33 +237,6 @@ const SideNavbar = () => {
     setExpandedMenus(prev => ({ ...prev, ...newExpandedMenus }))
   }, [location.pathname])
 
-
-  // Apply dark mode to document body
-  useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-    }
-    // Save preference to localStorage
-    localStorage.setItem('darkMode', isDarkMode.toString())
-  }, [isDarkMode])
-
-  // Listen for dark mode changes from other components (like SettingsMenu)
-  useEffect(() => {
-    const handleCustomChange = (event) => {
-      if (event.detail && event.detail.key === 'darkMode') {
-        const newValue = event.detail.newValue === 'true'
-        setIsDarkMode(newValue)
-      }
-    }
-
-    window.addEventListener('localStorageChange', handleCustomChange)
-
-    return () => {
-      window.removeEventListener('localStorageChange', handleCustomChange)
-    }
-  }, [])
 
   const displayName = useMemo(() => {
     return profile?.name || user?.user_metadata?.name || user?.email || 'User'
@@ -458,7 +428,6 @@ const SideNavbar = () => {
       <SettingsMenu
         isOpen={isSettingsMenuOpen}
         onClose={() => setIsSettingsMenuOpen(false)}
-        isDarkMode={isDarkMode} 
       />
     </div>
   )

@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import { useTheme } from '../contexts/ThemeContext'
 import { supabase } from '../lib/supabase'
+import SettingsMenu from './SettingsMenu'
 import {
   Home,
   FileText,
@@ -32,10 +34,10 @@ const MobileNavigation = ({
   generating = false,
   fetchingFreshData = false,
   onOpenChatHistory = null,
-  showChatHistory = false,
-  parentIsDarkMode = false
+  showChatHistory = false
 }) => {
   const { user, logout } = useAuth()
+  const { isDarkMode, setIsDarkMode, toggleTheme } = useTheme()
   const navigate = useNavigate()
   const location = useLocation()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -45,11 +47,8 @@ const MobileNavigation = ({
   const [profile, setProfile] = useState(null)
   const [profileFetched, setProfileFetched] = useState(false)
   const [expandedMenus, setExpandedMenus] = useState({})
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    // Default to dark mode for mobile
-    const saved = localStorage.getItem('darkMode')
-    return saved !== null ? saved === 'true' : true // Default to true (dark mode)
-  })
+  const [isSettingsSliderOpen, setIsSettingsSliderOpen] = useState(false)
+  const [settingsSliderTab, setSettingsSliderTab] = useState('profile')
 
   // Cache key for localStorage
   const getCacheKey = (userId) => `profile_${userId}`
@@ -123,24 +122,7 @@ const MobileNavigation = ({
     {
       name: 'Settings',
       icon: Settings,
-      hasSubmenu: true,
-      submenu: [
-        {
-          name: 'Connections',
-          href: '/settings',
-          icon: Settings
-        },
-        {
-          name: 'Preferences',
-          action: 'preferences',
-          icon: Settings
-        },
-        {
-          name: 'Billing',
-          href: '/billing',
-          icon: CreditCard
-        }
-      ]
+      href: '/settings'
     }
   ]
 
@@ -187,25 +169,24 @@ const MobileNavigation = ({
     return profile?.name || user?.user_metadata?.name || user?.email || 'User'
   }, [profile, user])
 
-  // Apply dark mode to document body
-  useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-    }
-    // Save preference to localStorage
-    localStorage.setItem('darkMode', isDarkMode.toString())
-    // Dispatch custom event to notify other components
-    window.dispatchEvent(new CustomEvent('localStorageChange', {
-      detail: { key: 'darkMode', newValue: isDarkMode.toString() }
-    }))
-  }, [isDarkMode])
-
   // Handle submenu item clicks
   const handleSubmenuClick = (item) => {
     if (item.action === 'preferences') {
-      setIsDarkMode(!isDarkMode)
+      setSettingsSliderTab('preferences')
+      setIsSettingsSliderOpen(true)
+      setIsMenuOpen(false)
+      return
+    }
+    if (item.name === 'Connections') {
+      setSettingsSliderTab('tools')
+      setIsSettingsSliderOpen(true)
+      setIsMenuOpen(false)
+      return
+    }
+    if (item.name === 'Billing') {
+      setSettingsSliderTab('billing')
+      setIsSettingsSliderOpen(true)
+      setIsMenuOpen(false)
       return
     }
     if (item.href) {
@@ -416,7 +397,7 @@ const MobileNavigation = ({
     <>
       {/* Mobile Header */}
       <div className={`md:hidden fixed top-0 left-0 right-0 shadow-sm border-b z-40 ${
-        parentIsDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'
+        isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'
       }`}>
         <div className="px-3 py-2">
           {/* Single Row Layout */}
@@ -437,10 +418,12 @@ const MobileNavigation = ({
               {onOpenChatHistory && (
                 <button
                   onClick={onOpenChatHistory}
-                  className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+                  className={`p-1.5 rounded-lg transition-colors ${
+                    isDarkMode ? 'hover:bg-gray-800 text-gray-300' : 'hover:bg-gray-100 text-gray-600'
+                  }`}
                   title="Chat History"
                 >
-                  <PanelRight className="w-5 h-5 text-gray-600" />
+                  <PanelRight className="w-5 h-5" />
                 </button>
               )}
 
@@ -448,9 +431,9 @@ const MobileNavigation = ({
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 className={`p-1.5 rounded-lg transition-colors ${
-                  parentIsDarkMode
+                  isDarkMode
                     ? 'hover:bg-gray-800 text-gray-300'
-                    : 'hover:bg-gray-100'
+                    : 'hover:bg-gray-100 text-gray-600'
                 }`}
               >
                 {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -563,12 +546,12 @@ const MobileNavigation = ({
       {/* Mobile Menu Overlay */}
       {isMenuOpen && (
         <div className={`md:hidden fixed inset-0 z-50 backdrop-blur-xl mobile-menu-container ${
-          parentIsDarkMode ? 'bg-gray-900/95' : 'bg-white/95'
+          isDarkMode ? 'bg-gray-900/95' : 'bg-white/95'
         }`}>
           <div className="flex flex-col h-full">
             {/* Menu Header */}
             <div className={`p-4 border-b ${
-              parentIsDarkMode ? 'border-gray-700' : 'border-gray-200'
+              isDarkMode ? 'border-gray-700' : 'border-gray-200'
             }`}>
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
@@ -581,20 +564,20 @@ const MobileNavigation = ({
                   </div>
                   <div>
                     <h1 className={`text-xl font-bold ${
-                      parentIsDarkMode ? 'text-gray-100' : 'text-gray-900'
+                      isDarkMode ? 'text-gray-100' : 'text-gray-900'
                     }`}>Emily</h1>
                     <p className={`text-sm ${
-                      parentIsDarkMode ? 'text-gray-400' : 'text-gray-500'
+                      isDarkMode ? 'text-gray-400' : 'text-gray-500'
                     }`}>AI Marketing</p>
                   </div>
                 </div>
                 <button
                   onClick={() => setIsMenuOpen(false)}
                   className={`p-2 rounded-lg transition-colors ${
-                    parentIsDarkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-100'
+                    isDarkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-100'
                   }`}
                 >
-                  <X size={24} className={parentIsDarkMode ? 'text-gray-300' : ''} />
+                  <X size={24} className={isDarkMode ? 'text-gray-300' : ''} />
                 </button>
               </div>
             </div>
@@ -606,6 +589,30 @@ const MobileNavigation = ({
                 const active = item.href ? isActive(item.href) : isSubmenuActive(item.submenu || [])
                 const isExpanded = expandedMenus[item.name]
                 
+                // Special handling for Settings to open slider
+                if (item.name === 'Settings') {
+                  return (
+                    <button
+                      key={item.name}
+                      onClick={() => {
+                        setSettingsSliderTab('profile')
+                        setIsSettingsSliderOpen(true)
+                        setIsMenuOpen(false)
+                      }}
+                      className={`w-full flex items-center p-4 rounded-lg transition-all duration-200 group ${
+                        isDarkMode
+                          ? 'text-gray-300 hover:bg-gray-800 hover:text-gray-100'
+                          : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                      }`}
+                    >
+                      <Icon className="w-6 h-6 mr-4" />
+                      <div className="flex-1 text-left">
+                        <div className="font-medium text-lg">{item.name}</div>
+                      </div>
+                    </button>
+                  )
+                }
+
                 if (item.hasSubmenu) {
                   return (
                     <div key={item.name}>
@@ -614,7 +621,7 @@ const MobileNavigation = ({
                         className={`w-full flex items-center p-4 rounded-lg transition-all duration-200 group ${
                           active
                             ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-lg'
-                            : parentIsDarkMode
+                            : isDarkMode
                             ? 'text-gray-300 hover:bg-gray-800 hover:text-gray-100'
                             : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
                         }`}
@@ -645,10 +652,10 @@ const MobileNavigation = ({
                                   subActive
                                     ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-lg'
                                     : subItem.action === 'preferences'
-                                    ? parentIsDarkMode
+                                    ? isDarkMode
                                       ? 'text-gray-300 hover:bg-gray-800 hover:text-gray-100'
                                       : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-                                    : parentIsDarkMode
+                                    : isDarkMode
                                     ? 'text-gray-300 hover:bg-gray-800 hover:text-gray-100'
                                     : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
                                 }`}
@@ -657,14 +664,14 @@ const MobileNavigation = ({
                                 <div className="flex-1 text-left">
                                   <div className="font-medium">
                                     {subItem.action === 'preferences'
-                                      ? `Theme: ${parentIsDarkMode ? 'Dark' : 'Light'}`
+                                      ? `Theme: ${isDarkMode ? 'Dark' : 'Light'}`
                                       : subItem.name
                                     }
                                   </div>
                                 </div>
                                 {subItem.action === 'preferences' && (
                                   <div className={`w-4 h-4 rounded-full border-2 transition-colors ${
-                                    parentIsDarkMode ? 'bg-gray-600 border-gray-400' : 'bg-yellow-400 border-yellow-300'
+                                    isDarkMode ? 'bg-gray-600 border-gray-400' : 'bg-yellow-400 border-yellow-300'
                                   }`} />
                                 )}
                               </button>
@@ -684,7 +691,7 @@ const MobileNavigation = ({
                         className={`w-full flex items-center p-4 rounded-lg transition-all duration-200 group ${
                           active
                             ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-lg'
-                            : parentIsDarkMode
+                            : isDarkMode
                             ? 'text-gray-300 hover:bg-gray-800 hover:text-gray-100'
                             : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
                         }`}
@@ -700,13 +707,17 @@ const MobileNavigation = ({
 
             {/* User Section */}
             <div className={`p-4 border-t ${
-              parentIsDarkMode ? 'border-gray-700' : 'border-gray-200'
+              isDarkMode ? 'border-gray-700' : 'border-gray-200'
             }`}>
               <div className="space-y-3">
                 <button
-                  onClick={() => navigate('/profile')}
+                  onClick={() => {
+                    setSettingsSliderTab('profile')
+                    setIsSettingsSliderOpen(true)
+                    setIsMenuOpen(false)
+                  }}
                   className={`w-full flex items-center p-4 rounded-lg transition-colors group ${
-                    parentIsDarkMode
+                    isDarkMode
                       ? 'bg-gray-800 hover:bg-gray-700'
                       : 'bg-gray-50 hover:bg-gray-100'
                   }`}
@@ -722,12 +733,12 @@ const MobileNavigation = ({
                   </div>
                   <div className="flex-1 min-w-0 text-left">
                     <p className={`text-lg font-medium truncate ${
-                      parentIsDarkMode ? 'text-gray-100' : 'text-gray-900'
+                      isDarkMode ? 'text-gray-100' : 'text-gray-900'
                     }`}>
                       {displayName}
                     </p>
                     <p className={`text-sm ${
-                      parentIsDarkMode ? 'text-gray-400' : 'text-gray-500'
+                      isDarkMode ? 'text-gray-400' : 'text-gray-500'
                     }`}>Click to view profile</p>
                   </div>
                 </button>
@@ -735,7 +746,7 @@ const MobileNavigation = ({
                 <button
                   onClick={handleLogout}
                   className={`w-full flex items-center p-4 rounded-lg transition-colors group ${
-                    parentIsDarkMode
+                    isDarkMode
                       ? 'text-gray-300 hover:bg-red-900/20 hover:text-red-400'
                       : 'text-gray-600 hover:bg-red-50 hover:text-red-600'
                   }`}
@@ -748,6 +759,13 @@ const MobileNavigation = ({
           </div>
         </div>
       )}
+
+      {/* Settings Slider */}
+      <SettingsMenu 
+        isOpen={isSettingsSliderOpen} 
+        onClose={() => setIsSettingsSliderOpen(false)} 
+        initialTab={settingsSliderTab}
+      />
     </>
   )
 }

@@ -6,17 +6,19 @@ import { connectionsAPI } from '../services/connections'
 import { fetchAllConnections } from '../services/fetchConnections'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
+import { useTheme } from '../contexts/ThemeContext'
 import EditProfileModal from './EditProfileModal'
 import { subscriptionAPI } from '../services/subscription'
 import { generateInvoicePDF } from '../services/pdfGenerator'
 
-const SettingsMenu = ({ isOpen, onClose, isDarkMode = false }) => {
+const SettingsMenu = ({ isOpen, onClose, initialTab = 'profile' }) => {
   const navigate = useNavigate()
   const { user } = useAuth()
+  const { isDarkMode, setIsDarkMode, toggleTheme } = useTheme()
   const [connections, setConnections] = useState([])
   const [loading, setLoading] = useState(false)
   const [selectedPlatform, setSelectedPlatform] = useState('')
-  const [activeTab, setActiveTab] = useState('profile') // 'profile', 'tools', 'billing', or 'preferences'
+  const [activeTab, setActiveTab] = useState(initialTab) // 'profile', 'tools', 'billing', or 'preferences'
   const [profile, setProfile] = useState(null)
   const [profileLoading, setProfileLoading] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
@@ -24,8 +26,14 @@ const SettingsMenu = ({ isOpen, onClose, isDarkMode = false }) => {
   const [billingHistory, setBillingHistory] = useState([])
   const [billingLoading, setBillingLoading] = useState(false)
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false)
-  const [localDarkMode, setLocalDarkMode] = useState(isDarkMode)
   const pollingIntervalRef = useRef(null)
+
+  // Update active tab when initialTab changes or menu opens
+  useEffect(() => {
+    if (isOpen && initialTab) {
+      setActiveTab(initialTab)
+    }
+  }, [isOpen, initialTab])
 
   const platforms = [
     { id: 'facebook', name: 'Facebook' },
@@ -111,11 +119,6 @@ const SettingsMenu = ({ isOpen, onClose, isDarkMode = false }) => {
     // Initial check
     poll()
   }
-
-  // Sync local dark mode with parent component
-  useEffect(() => {
-    setLocalDarkMode(isDarkMode)
-  }, [isDarkMode])
 
   useEffect(() => {
     if (isOpen) {
@@ -230,17 +233,6 @@ const SettingsMenu = ({ isOpen, onClose, isDarkMode = false }) => {
       console.error('Error generating bill PDF:', error)
       alert(`Failed to generate bill PDF: ${error.message || 'Unknown error'}`)
     }
-  }
-
-  const toggleDarkMode = () => {
-    const newValue = !localDarkMode
-    setLocalDarkMode(newValue)
-    // Save to localStorage
-    localStorage.setItem('darkMode', newValue.toString())
-    // Dispatch custom event to notify other components
-    window.dispatchEvent(new CustomEvent('localStorageChange', {
-      detail: { key: 'darkMode', newValue: newValue.toString() }
-    }))
   }
 
   // Listen for OAuth success events
@@ -473,7 +465,7 @@ const SettingsMenu = ({ isOpen, onClose, isDarkMode = false }) => {
       
       {/* Settings Panel */}
       <div
-        className={`fixed top-0 left-0 h-full w-[600px] shadow-2xl z-50 transform transition-transform duration-300 ease-in-out ${
+        className={`fixed top-0 left-0 h-full w-full md:w-[600px] shadow-2xl z-50 transform transition-transform duration-300 ease-in-out ${
           isDarkMode
             ? 'bg-gray-800 border-r border-gray-700'
             : 'bg-white'
@@ -498,72 +490,73 @@ const SettingsMenu = ({ isOpen, onClose, isDarkMode = false }) => {
           </button>
         </div>
 
-        {/* Two Column Content */}
-        <div className="flex h-[calc(100vh-64px)] overflow-hidden">
-          {/* Left Column - Tabs */}
-          <div className={`w-1/3 border-r overflow-y-auto ${
-            isDarkMode ? 'border-gray-700 bg-gray-900' : 'border-gray-200'
+        {/* Responsive Content Layout */}
+        <div className="flex flex-col md:flex-row h-[calc(100vh-64px)] overflow-hidden">
+          {/* Tabs Container */}
+          <div className={`w-full md:w-1/3 border-b md:border-b-0 md:border-r overflow-x-auto md:overflow-y-auto ${
+            isDarkMode ? 'border-gray-700 bg-gray-900' : 'border-gray-200 bg-gray-50/50'
           }`}>
-            <div className="p-2">
+            <div className="flex flex-row md:flex-col p-2 min-w-max md:min-w-0 transition-all duration-300">
               <button
                 onClick={() => {
                   setActiveTab('profile')
                   fetchProfile()
                 }}
-                className={`w-full flex items-center p-3 mb-2 rounded-lg transition-colors ${
+                className={`flex-1 md:w-full flex items-center p-3 md:mb-2 rounded-lg transition-all duration-200 whitespace-nowrap mr-2 md:mr-0 ${
                   activeTab === 'profile'
                     ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg'
                     : isDarkMode
                     ? 'text-gray-300 hover:bg-gray-700'
-                    : 'text-gray-700 hover:bg-gray-100'
+                    : 'text-gray-700 hover:bg-gray-200'
                 }`}
               >
-                <User className="w-4 h-4 mr-2" />
-                <span className="text-sm font-medium">Profile</span>
+                <User className={`w-4 h-4 flex-shrink-0 ${activeTab === 'profile' ? 'mr-2' : 'md:mr-2'}`} />
+                <span className={`text-sm font-medium md:inline ${activeTab === 'profile' ? 'inline' : 'hidden'}`}>Profile</span>
               </button>
               <button
                 onClick={() => setActiveTab('tools')}
-                className={`w-full flex items-center p-3 mb-2 rounded-lg transition-colors ${
+                className={`flex-1 md:w-full flex items-center p-3 md:mb-2 rounded-lg transition-all duration-200 whitespace-nowrap mr-2 md:mr-0 ${
                   activeTab === 'tools'
                     ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg'
                     : isDarkMode
                     ? 'text-gray-300 hover:bg-gray-700'
-                    : 'text-gray-700 hover:bg-gray-100'
+                    : 'text-gray-700 hover:bg-gray-200'
                 }`}
               >
-                <span className="text-sm font-medium">Connections</span>
+                <Settings className={`w-4 h-4 flex-shrink-0 ${activeTab === 'tools' ? 'mr-2' : 'md:mr-2'}`} />
+                <span className={`text-sm font-medium md:inline ${activeTab === 'tools' ? 'inline' : 'hidden'}`}>Connections</span>
               </button>
               <button
                 onClick={() => setActiveTab('billing')}
-                className={`w-full flex items-center p-3 mb-2 rounded-lg transition-colors ${
+                className={`flex-1 md:w-full flex items-center p-3 md:mb-2 rounded-lg transition-all duration-200 whitespace-nowrap mr-2 md:mr-0 ${
                   activeTab === 'billing'
                     ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg'
                     : isDarkMode
                     ? 'text-gray-300 hover:bg-gray-700'
-                    : 'text-gray-700 hover:bg-gray-100'
+                    : 'text-gray-700 hover:bg-gray-200'
                 }`}
               >
-                <CreditCard className="w-4 h-4 mr-2" />
-                <span className="text-sm font-medium">Billing</span>
+                <CreditCard className={`w-4 h-4 flex-shrink-0 ${activeTab === 'billing' ? 'mr-2' : 'md:mr-2'}`} />
+                <span className={`text-sm font-medium md:inline ${activeTab === 'billing' ? 'inline' : 'hidden'}`}>Billing</span>
               </button>
               <button
                 onClick={() => setActiveTab('preferences')}
-                className={`w-full flex items-center p-3 mb-2 rounded-lg transition-colors ${
+                className={`flex-1 md:w-full flex items-center p-3 md:mb-2 rounded-lg transition-all duration-200 whitespace-nowrap md:mr-0 ${
                   activeTab === 'preferences'
                     ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg'
                     : isDarkMode
                     ? 'text-gray-300 hover:bg-gray-700'
-                    : 'text-gray-700 hover:bg-gray-100'
+                    : 'text-gray-700 hover:bg-gray-200'
                 }`}
               >
-                <Settings className="w-4 h-4 mr-2" />
-                <span className="text-sm font-medium">Preferences</span>
+                <Settings className={`w-4 h-4 flex-shrink-0 ${activeTab === 'preferences' ? 'mr-2' : 'md:mr-2'}`} />
+                <span className={`text-sm font-medium md:inline ${activeTab === 'preferences' ? 'inline' : 'hidden'}`}>Preferences</span>
               </button>
             </div>
           </div>
 
           {/* Right Column - Tab Content */}
-          <div className="flex-1 overflow-y-auto p-4">
+          <div className="flex-1 overflow-y-auto p-4 md:p-6">
             {activeTab === 'profile' && (
               <div>
                 <h3 className={`text-sm font-semibold mb-4 ${
@@ -872,50 +865,16 @@ const SettingsMenu = ({ isOpen, onClose, isDarkMode = false }) => {
                       isDarkMode ? 'text-gray-300' : 'text-gray-600'
                     }`}>Theme</h4>
 
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className={`text-sm font-medium ${
-                          isDarkMode ? 'text-gray-200' : 'text-gray-900'
-                        }`}>
-                          Dark Mode
-                        </div>
-                        <div className={`text-xs mt-1 ${
-                          isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                        }`}>
-                          Toggle between light and dark themes
-                        </div>
-                      </div>
-
-                      {/* Toggle Switch */}
-                      <div
-                        className="relative inline-block w-12 h-6 cursor-pointer"
-                        onClick={toggleDarkMode}
-                      >
-                        <div
-                          className={`relative w-full h-full rounded-full transition-all duration-300 ${
-                            localDarkMode
-                              ? 'bg-green-500'
-                              : 'bg-gray-300'
-                          }`}
-                        >
-                          <div
-                            className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transition-transform duration-300 ${
-                              localDarkMode
-                                ? 'transform translate-x-6'
-                                : 'transform translate-x-0'
-                            }`}
-                          />
-                        </div>
-                      </div>
-                    </div>
-
                     {/* Theme Preview */}
-                    <div className="mt-4 grid grid-cols-2 gap-3">
-                      <div className={`p-3 rounded-lg border-2 transition-colors ${
-                        !localDarkMode
-                          ? 'border-green-500 bg-white'
-                          : 'border-gray-600 bg-gray-100'
-                      }`}>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div 
+                        onClick={() => setIsDarkMode(false)}
+                        className={`p-3 rounded-lg border-2 transition-all duration-200 cursor-pointer hover:shadow-md ${
+                          !isDarkMode
+                            ? 'border-green-500 bg-white'
+                            : 'border-gray-600 bg-gray-100'
+                        }`}
+                      >
                         <div className="text-xs font-medium text-gray-600 mb-2">Light</div>
                         <div className="space-y-1">
                           <div className="h-2 bg-gray-200 rounded"></div>
@@ -923,11 +882,14 @@ const SettingsMenu = ({ isOpen, onClose, isDarkMode = false }) => {
                         </div>
                       </div>
 
-                      <div className={`p-3 rounded-lg border-2 transition-colors ${
-                        localDarkMode
-                          ? 'border-green-500 bg-gray-800'
-                          : 'border-gray-600 bg-gray-800'
-                      }`}>
+                      <div 
+                        onClick={() => setIsDarkMode(true)}
+                        className={`p-3 rounded-lg border-2 transition-all duration-200 cursor-pointer hover:shadow-md ${
+                          isDarkMode
+                            ? 'border-green-500 bg-gray-800'
+                            : 'border-gray-600 bg-gray-800'
+                        }`}
+                      >
                         <div className="text-xs font-medium text-gray-300 mb-2">Dark</div>
                         <div className="space-y-1">
                           <div className="h-2 bg-gray-700 rounded"></div>

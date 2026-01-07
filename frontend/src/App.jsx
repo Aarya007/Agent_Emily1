@@ -160,11 +160,9 @@ function AppContent() {
       <Routes>
         {/*  Routes */}
         <Route path="/" element={<LandingPage />} />
-<<<<<<< HEAD
+
         <Route path="/workvillage" element={<WorkVillageLandingPage />} />
-=======
-        <Route path="/workvillage" element={<WorkVillageLanding />} />
->>>>>>> dae9531b0e02cef110c0fa128e4bde825d1d1bf8
+
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/terms" element={<TermsAndConditions />} />
         <Route path="/cancellation-refunds" element={<CancellationAndRefunds />} />
@@ -328,3 +326,6 @@ function App() {
 }
 
 export default App
+
+
+

@@ -103,26 +103,15 @@ const Page = () => {
               </div>
               <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
                 <button
-<<<<<<< HEAD
-                  onClick={() => scrollToSection('features')}
-                  className={`text-sm sm:text-base transition-colors font-normal ${activeSection === 'features' ? 'text-pink-400' : 'text-gray-300 hover:text-white'}`}
-=======
+
                   onClick={() => scrollToSection('ecosystem')}
                   className={`text-sm sm:text-base transition-colors ${activeSection === 'ecosystem' ? 'text-[#9E005C]' : 'text-[#2E2E2E]/70 hover:text-[#2E2E2E]'}`}
->>>>>>> dae9531b0e02cef110c0fa128e4bde825d1d1bf8
+
                 >
                   Ecosystem
                 </button>
                 <button
-<<<<<<< HEAD
-                  onClick={() => scrollToSection('agents')}
-                  className={`text-sm sm:text-base transition-colors font-normal ${activeSection === 'agents' ? 'text-pink-400' : 'text-gray-300 hover:text-white'}`}
-                >
-                  Agents
-                </button>
-                <button
-=======
->>>>>>> dae9531b0e02cef110c0fa128e4bde825d1d1bf8
+
                   onClick={() => scrollToSection('pricing')}
                   className={`text-sm sm:text-base transition-colors font-normal ${activeSection === 'pricing' ? 'text-pink-400' : 'text-gray-300 hover:text-white'}`}
                 >
@@ -159,26 +148,15 @@ const Page = () => {
         <div className="fixed inset-0 z-40 md:hidden bg-gray-900/95 backdrop-blur-xl">
           <div className="flex flex-col items-center justify-center h-full space-y-6 sm:space-y-8">
             <button
-<<<<<<< HEAD
-              onClick={() => scrollToSection('features')}
-              className="text-lg sm:text-xl text-gray-300 hover:text-white transition-colors font-normal"
-=======
+
               onClick={() => scrollToSection('ecosystem')}
               className="text-lg sm:text-xl text-[#2E2E2E]/70 hover:text-[#2E2E2E] transition-colors"
->>>>>>> dae9531b0e02cef110c0fa128e4bde825d1d1bf8
+
             >
               Ecosystem
             </button>
             <button
-<<<<<<< HEAD
-              onClick={() => scrollToSection('agents')}
-              className="text-lg sm:text-xl text-gray-300 hover:text-white transition-colors font-normal"
-            >
-              Agents
-            </button>
-            <button
-=======
->>>>>>> dae9531b0e02cef110c0fa128e4bde825d1d1bf8
+
               onClick={() => scrollToSection('pricing')}
               className="text-lg sm:text-xl text-gray-300 hover:text-white transition-colors font-normal"
             >
@@ -241,194 +219,16 @@ const Page = () => {
         
         <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
           <button
-<<<<<<< HEAD
-            onClick={() => scrollToSection('features')}
-            className="text-gray-400 hover:text-white transition-colors animate-bounce"
-=======
+
             onClick={() => scrollToSection('ecosystem')}
             className="text-[#2E2E2E]/50 hover:text-[#2E2E2E] transition-colors animate-bounce"
->>>>>>> dae9531b0e02cef110c0fa128e4bde825d1d1bf8
+
           >
             <ChevronDown size={24} />
           </button>
         </div>
       </section>
 
-<<<<<<< HEAD
-      {/* Features Section */}
-      <section id="features" className="py-12 sm:py-16 lg:py-20 bg-gray-800">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-10 sm:mb-12 lg:mb-16">
-            <h2 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-normal mb-3 sm:mb-4 md:mb-6 text-white">
-              Why Choose atsn ai Agents?
-            </h2>
-            <p className="text-sm xs:text-base sm:text-lg md:text-xl text-gray-300 max-w-2xl mx-auto px-4 font-normal">
-              Our AI agents are designed to work independently, learn from your preferences,
-              and continuously improve their performance.
-            </p>
-          </div>
-
-          {/* Agent Icons Showcase */}
-          <div className="w-full mx-auto px-4 sm:px-6 mb-10 sm:mb-12 lg:mb-16">
-            <div className="flex justify-center">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 lg:gap-12 max-w-4xl">
-                {/* Emily Icon */}
-                <div className="flex flex-col items-center group">
-                  <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg hover:shadow-pink-500/25 transition-all duration-300 transform hover:scale-110 mb-3">
-                    <img src="/emily_icon.png" alt="Emily" className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full object-cover" />
-                  </div>
-                  <h3 className="text-white font-normal text-sm sm:text-base md:text-lg text-center">Emily</h3>
-                  <p className="text-gray-400 font-normal text-xs sm:text-sm text-center">Marketing Agent</p>
-                </div>
-
-                {/* Leo Icon */}
-                <div className="flex flex-col items-center group">
-                  <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg hover:shadow-blue-500/25 transition-all duration-300 transform hover:scale-110 mb-3">
-                    <img src="/leo_logo.png" alt="Leo" className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full object-cover" />
-                  </div>
-                  <h3 className="text-white font-normal text-sm sm:text-base md:text-lg text-center">Leo</h3>
-                  <p className="text-gray-400 font-normal text-xs sm:text-sm text-center">Content Agent</p>
-                </div>
-
-                {/* Chase Icon */}
-                <div className="flex flex-col items-center group">
-                  <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 bg-gradient-to-br from-green-500 to-blue-600 rounded-full flex items-center justify-center shadow-lg hover:shadow-green-500/25 transition-all duration-300 transform hover:scale-110 mb-3">
-                    <img src="/chase_logo.png" alt="Chase" className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full object-cover" />
-                  </div>
-                  <h3 className="text-white font-normal text-sm sm:text-base md:text-lg text-center">Chase</h3>
-                  <p className="text-gray-400 font-normal text-xs sm:text-sm text-center">Lead Agent</p>
-                </div>
-
-                {/* Orion Icon */}
-                <div className="flex flex-col items-center group">
-                  <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-full flex items-center justify-center shadow-lg hover:shadow-purple-500/25 transition-all duration-300 transform hover:scale-110 mb-3">
-                    <img src="/orion.png" alt="Orion" className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full object-cover" />
-                  </div>
-                  <h3 className="text-white font-normal text-sm sm:text-base md:text-lg text-center">Orion</h3>
-                  <p className="text-gray-400 font-normal text-xs sm:text-sm text-center">Analytics Agent</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            <div className="bg-gradient-to-br from-gray-700 to-gray-800 rounded-2xl p-6 sm:p-8 border border-gray-600 hover:border-pink-500/50 transition-all duration-300 shadow-lg hover:shadow-xl">
-              <div className="w-12 h-12 bg-gradient-to-r from-pink-500 to-purple-600 rounded-xl flex items-center justify-center mb-4 sm:mb-6 mx-auto sm:mx-0">
-                <Brain className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-base sm:text-lg md:text-xl font-normal mb-2 sm:mb-3 md:mb-4 text-white text-center sm:text-left">Fully Autonomous</h3>
-              <p className="text-xs sm:text-sm md:text-base text-gray-300 leading-relaxed text-center sm:text-left font-normal">
-                Our agents work independently, making decisions and taking actions 
-                without constant supervision.
-              </p>
-            </div>
-            
-            <div className="bg-gradient-to-br from-gray-700 to-gray-800 rounded-2xl p-6 sm:p-8 border border-gray-600 hover:border-purple-500/50 transition-all duration-300 shadow-lg hover:shadow-xl">
-              <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-600 rounded-xl flex items-center justify-center mb-4 sm:mb-6 mx-auto sm:mx-0">
-                <Zap className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-base sm:text-lg md:text-xl font-normal mb-2 sm:mb-3 md:mb-4 text-white text-center sm:text-left">Lightning Fast</h3>
-              <p className="text-xs sm:text-sm md:text-base text-gray-300 leading-relaxed text-center sm:text-left font-normal">
-                Execute complex tasks in seconds, not hours. 
-                Our agents are optimized for speed and efficiency.
-              </p>
-            </div>
-            
-            <div className="bg-gradient-to-br from-gray-700 to-gray-800 rounded-2xl p-6 sm:p-8 border border-gray-600 hover:border-blue-500/50 transition-all duration-300 shadow-lg hover:shadow-xl sm:col-span-2 lg:col-span-1">
-              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-pink-500 rounded-xl flex items-center justify-center mb-4 sm:mb-6 mx-auto sm:mx-0">
-                <Users className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-base sm:text-lg md:text-xl font-normal mb-2 sm:mb-3 md:mb-4 text-white text-center sm:text-left">Always Learning</h3>
-              <p className="text-xs sm:text-sm md:text-base text-gray-300 leading-relaxed text-center sm:text-left font-normal">
-                Continuously improve and adapt to your workflow, 
-                becoming more effective over time.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Agents Section */}
-      <section id="agents" className="py-12 sm:py-16 lg:py-20 bg-gray-900">
-        <div className="w-full mx-auto px-4 sm:px-6">
-          <div className="text-center mb-10 sm:mb-12 lg:mb-16">
-            <h2 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-normal mb-3 sm:mb-4 md:mb-6 text-white">
-              Meet Your AI Team
-            </h2>
-            <p className="text-sm xs:text-base sm:text-lg md:text-xl text-gray-300 max-w-2xl mx-auto px-4 font-normal">
-              Your dedicated AI team working together to automate your business processes.
-            </p>
-          </div>
-
-          {/* Agent Description Cards */}
-          <div className="w-[95%] md:w-5/6 mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
-            {/* Emily - Digital Marketing Agent */}
-            <div className="relative group">
-              <div className="absolute inset-0 bg-pink-500/10 rounded-2xl sm:rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-              <div className="relative w-full bg-gradient-to-br from-gray-700 to-gray-800 rounded-2xl sm:rounded-3xl p-6 sm:p-8 border border-gray-600 hover:border-pink-500/50 transition-all duration-300 shadow-lg hover:shadow-xl">
-                <div className="flex items-center space-x-3 sm:space-x-4 mb-4 sm:mb-6">
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
-                    <img src="/emily_icon.png" alt="Emily" className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full object-cover" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg sm:text-xl md:text-2xl font-normal text-white">Emily</h3>
-                    <p className="text-sm sm:text-base text-gray-300 font-normal">Digital Marketing Agent</p>
-                    <div className="inline-flex items-center space-x-1 bg-green-500/30 text-green-400 px-2 py-1 rounded-full text-xs mt-1">
-                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                      <span>Now Live</span>
-                    </div>
-                  </div>
-                </div>
-
-                <p className="text-sm sm:text-base text-gray-300 mb-4 sm:mb-6 leading-relaxed font-normal">
-                  Your dedicated digital marketing specialist who handles content creation, social media management,
-                  campaign optimization, and analytics - all autonomously to boost your online presence.
-                </p>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4 sm:mb-6">
-                  <div className="flex items-center space-x-2">
-                    <Check className="w-4 h-4 text-pink-400 flex-shrink-0" />
-                    <span className="text-sm text-gray-300 font-normal">Content Creation</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Check className="w-4 h-4 text-pink-400 flex-shrink-0" />
-                    <span className="text-sm text-gray-300 font-normal">Social Media</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Check className="w-4 h-4 text-pink-400 flex-shrink-0" />
-                    <span className="text-sm text-gray-300 font-normal">Campaign Optimization</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Check className="w-4 h-4 text-pink-400 flex-shrink-0" />
-                    <span className="text-sm text-gray-300 font-normal">Analytics & Reporting</span>
-                  </div>
-                </div>
-
-                <a
-                  href="/login"
-                  className="w-full bg-gradient-to-r from-pink-600 to-purple-600 text-white py-3 rounded-xl font-normal hover:from-pink-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 flex items-center justify-center"
-                >
-                  Access Emily
-                </a>
-              </div>
-            </div>
-            
-            {/* Leo - Content Creation Agent */}
-            <div className="relative group">
-              <div className="absolute inset-0 bg-blue-500/10 rounded-2xl sm:rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-              <div className="relative w-full bg-gradient-to-br from-gray-700 to-gray-800 rounded-2xl sm:rounded-3xl p-6 sm:p-8 border border-gray-600 hover:border-blue-500/50 transition-all duration-300 shadow-lg hover:shadow-xl">
-                <div className="flex items-center space-x-3 sm:space-x-4 mb-4 sm:mb-6">
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
-                    <img src="/leo_logo.png" alt="Leo" className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full object-cover" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg sm:text-xl md:text-2xl font-normal text-white">Leo</h3>
-                    <p className="text-sm sm:text-base text-gray-300 font-normal">Content Creation Agent</p>
-                    <div className="inline-flex items-center space-x-1 bg-green-500/30 text-green-400 px-2 py-1 rounded-full text-xs mt-1">
-                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                      <span>Now Live</span>
-=======
       {/* Ecosystem Section */}
       <section id="ecosystem" className="py-12 sm:py-16 lg:py-20 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
@@ -504,153 +304,16 @@ const Page = () => {
                   <div className="text-center space-y-4">
                     <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-r from-[#9E005C] to-[#FF4D94] rounded-2xl flex items-center justify-center mx-auto">
                       <Brain className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
->>>>>>> dae9531b0e02cef110c0fa128e4bde825d1d1bf8
+
                     </div>
                     <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-[#2E2E2E]">WorkVillage</h3>
                     <p className="text-sm sm:text-base text-[#2E2E2E]/70">Where AI Agents Work as a Team</p>
                   </div>
                 </div>
-<<<<<<< HEAD
 
-                <p className="text-sm sm:text-base text-gray-300 mb-4 sm:mb-6 leading-relaxed font-normal">
-                  Your creative content specialist who crafts compelling copy, designs engaging visuals,
-                  and produces high-quality content across all platforms to captivate your audience.
-                </p>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4 sm:mb-6">
-                  <div className="flex items-center space-x-2">
-                    <Check className="w-4 h-4 text-blue-400 flex-shrink-0" />
-                    <span className="text-sm text-gray-300 font-normal">Content Writing</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Check className="w-4 h-4 text-blue-400 flex-shrink-0" />
-                    <span className="text-sm text-gray-300 font-normal">Visual Design</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Check className="w-4 h-4 text-blue-400 flex-shrink-0" />
-                    <span className="text-sm text-gray-300 font-normal">Brand Consistency</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Check className="w-4 h-4 text-blue-400 flex-shrink-0" />
-                    <span className="text-sm text-gray-300 font-normal">Multi-Platform Content</span>
-                  </div>
-                </div>
-
-                <a
-                  href="/login"
-                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-normal hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 flex items-center justify-center"
-                >
-                  Access Leo
-                </a>
-              </div>
-            </div>
-            
-            {/* Chase - Lead Management Agent */}
-            <div className="relative group">
-              <div className="absolute inset-0 bg-green-500/10 rounded-2xl sm:rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-              <div className="relative w-full bg-gradient-to-br from-gray-700 to-gray-800 rounded-2xl sm:rounded-3xl p-6 sm:p-8 border border-gray-600 hover:border-green-500/50 transition-all duration-300 shadow-lg hover:shadow-xl">
-                <div className="flex items-center space-x-3 sm:space-x-4 mb-4 sm:mb-6">
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-gradient-to-r from-green-500 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
-                    <img src="/chase_logo.png" alt="Chase" className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full object-cover" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg sm:text-xl md:text-2xl font-normal text-white">Chase</h3>
-                    <p className="text-sm sm:text-base text-gray-300 font-normal">Lead Management Agent</p>
-                    <div className="inline-flex items-center space-x-1 bg-green-500/30 text-green-400 px-2 py-1 rounded-full text-xs mt-1">
-                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                      <span>Now Live</span>
-                    </div>
-                  </div>
-                </div>
-
-                <p className="text-sm sm:text-base text-gray-300 mb-4 sm:mb-6 leading-relaxed font-normal">
-                  Your strategic lead generation and relationship-building expert who identifies prospects,
-                  manages customer relationships, and ensures no opportunity slips through the cracks.
-                </p>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4 sm:mb-6">
-                  <div className="flex items-center space-x-2">
-                    <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
-                    <span className="text-sm text-gray-300 font-normal">Lead Generation</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
-                    <span className="text-sm text-gray-300 font-normal">CRM Management</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
-                    <span className="text-sm text-gray-300 font-normal">Follow-up Automation</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
-                    <span className="text-sm text-gray-300 font-normal">Relationship Building</span>
-                  </div>
-                </div>
-
-                <a
-                  href="/login"
-                  className="w-full bg-gradient-to-r from-green-600 to-blue-600 text-white py-3 rounded-xl font-normal hover:from-green-700 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 flex items-center justify-center"
-                >
-                  Access Chase
-                </a>
               </div>
             </div>
 
-            {/* Orion - Analytics Agent */}
-            <div className="relative group">
-              <div className="absolute inset-0 bg-purple-500/10 rounded-2xl sm:rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-              <div className="relative w-full bg-gradient-to-br from-gray-700 to-gray-800 rounded-2xl sm:rounded-3xl p-6 sm:p-8 border border-gray-600 hover:border-purple-500/50 transition-all duration-300 shadow-lg hover:shadow-xl">
-                <div className="flex items-center space-x-3 sm:space-x-4 mb-4 sm:mb-6">
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-full flex items-center justify-center flex-shrink-0">
-                    <img src="/orion.png" alt="Orion" className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full object-cover" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg sm:text-xl md:text-2xl font-normal text-white">Orion</h3>
-                    <p className="text-sm sm:text-base text-gray-300 font-normal">Analytics Agent</p>
-                    <div className="inline-flex items-center space-x-1 bg-green-500/30 text-green-400 px-2 py-1 rounded-full text-xs mt-1">
-                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                      <span>Now Live</span>
-                    </div>
-                  </div>
-                </div>
-
-                <p className="text-sm sm:text-base text-gray-300 mb-4 sm:mb-6 leading-relaxed font-normal">
-                  Your data-driven insights specialist who analyzes performance metrics, uncovers trends,
-                  and provides actionable intelligence to optimize your business strategies.
-                </p>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4 sm:mb-6">
-                  <div className="flex items-center space-x-2">
-                    <Check className="w-4 h-4 text-purple-400 flex-shrink-0" />
-                    <span className="text-sm text-gray-300 font-normal">Performance Analytics</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Check className="w-4 h-4 text-purple-400 flex-shrink-0" />
-                    <span className="text-sm text-gray-300 font-normal">Trend Analysis</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Check className="w-4 h-4 text-purple-400 flex-shrink-0" />
-                    <span className="text-sm text-gray-300 font-normal">ROI Tracking</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Check className="w-4 h-4 text-purple-400 flex-shrink-0" />
-                    <span className="text-sm text-gray-300 font-normal">Strategic Insights</span>
-                  </div>
-                </div>
-
-                <a
-                  href="/login"
-                  className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 rounded-xl font-normal hover:from-purple-700 hover:to-indigo-700 transition-all duration-300 transform hover:scale-105 flex items-center justify-center"
-                >
-                  Access Orion
-                </a>
-              </div>
-            </div>
-            </div>
-=======
-              </div>
-            </div>
->>>>>>> dae9531b0e02cef110c0fa128e4bde825d1d1bf8
           </div>
         </div>
       </section>
@@ -949,3 +612,5 @@ const Page = () => {
 };
 
 export default Page;
+
+

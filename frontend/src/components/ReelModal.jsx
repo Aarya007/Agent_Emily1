@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { X, Hash, Edit, Check, X as XIcon, Sparkles, Upload } from 'lucide-react'
+import { X, Hash, Edit, Check, X as XIcon, Sparkles, Upload, Clock, Send, Trash2, RefreshCw } from 'lucide-react'
 import { Instagram, Facebook, MessageCircle } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import ReactMarkdown from 'react-markdown'
@@ -35,11 +35,28 @@ const useStorageListener = (key, callback) => {
   }, [key, callback])
 }
 
-const ReelModal = ({ content, onClose }) => {
+const ReelModal = ({ 
+  content, 
+  onClose,
+  onEdit,
+  onSchedule,
+  onPublish,
+  onDelete,
+  isPublishing = false,
+  isDeleting = false
+}) => {
   const [isDarkMode] = React.useState(getDarkModePreference)
   const [dbContent, setDbContent] = useState(null)
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
   useStorageListener('darkMode', () => {})
 
   // Fetch content directly from Supabase
@@ -411,8 +428,54 @@ const ReelModal = ({ content, onClose }) => {
 
           </div>
         </div>
+
+        {/* Mobile Action Footer */}
+        {isMobile && (
+            <div className={`p-4 border-t flex justify-around items-center ${
+              isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-50'
+            }`}>
+              <button
+                onClick={(e) => { e.stopPropagation(); onEdit(); }}
+                className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-colors ${
+                  isDarkMode ? 'text-blue-400 hover:bg-gray-700' : 'text-blue-600 hover:bg-gray-100'
+                }`}
+              >
+                <Edit className="w-5 h-5" />
+                <span className="text-[10px]">Edit</span>
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); onSchedule(); }}
+                className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-colors ${
+                  isDarkMode ? 'text-green-400 hover:bg-gray-700' : 'text-green-600 hover:bg-gray-100'
+                }`}
+              >
+                <Clock className="w-5 h-5" />
+                <span className="text-[10px]">Schedule</span>
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); onPublish(); }}
+                disabled={isPublishing}
+                className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-colors ${
+                  isDarkMode ? 'text-purple-400 hover:bg-gray-700' : 'text-purple-600 hover:bg-gray-100'
+                } ${isPublishing ? 'opacity-50' : ''}`}
+              >
+                {isPublishing ? <RefreshCw className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
+                <span className="text-[10px]">Publish</span>
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); onDelete(); }}
+                disabled={isDeleting}
+                className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-colors ${
+                  isDarkMode ? 'text-red-400 hover:bg-gray-700' : 'text-red-600 hover:bg-gray-100'
+                } ${isDeleting ? 'opacity-50' : ''}`}
+              >
+                {isDeleting ? <RefreshCw className="w-5 h-5 animate-spin" /> : <Trash2 className="w-5 h-5" />}
+                <span className="text-[10px]">Delete</span>
+              </button>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
   )
 }
 

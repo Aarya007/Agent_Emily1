@@ -4,6 +4,7 @@ import SideNavbar from './SideNavbar'
 import MobileNavigation from './MobileNavigation'
 import EditProfileModal from './EditProfileModal'
 import LogoUpload from './LogoUpload'
+import MobileColorPicker from './MobileColorPicker'
 import { User, Mail, Phone, MapPin, Calendar, Edit, Save, X, Loader2, Building2, Globe, Target, BarChart3, Megaphone, Settings, Image as ImageIcon } from 'lucide-react'
 
 const Profile = () => {
@@ -494,43 +495,23 @@ const Profile = () => {
             {/* Primary Color */}
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-2">Primary Color</label>
-              <div className="flex items-center space-x-2">
-                <input
-                  type="color"
-                  value={editForm.primary_color || '#000000'}
-                  onChange={(e) => handleInputChange('primary_color', e.target.value)}
-                  className="w-16 h-10 border border-gray-300 rounded-lg cursor-pointer"
-                />
-                <input
-                  type="text"
-                  value={editForm.primary_color || ''}
-                  onChange={(e) => handleInputChange('primary_color', e.target.value)}
-                  className="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm border border-gray-200 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 bg-white/50 backdrop-blur-sm shadow-sm"
-                  placeholder="#000000"
-                  pattern="^#[0-9A-Fa-f]{6}$"
-                />
-              </div>
+              <MobileColorPicker
+                value={editForm.primary_color}
+                onChange={(val) => handleInputChange('primary_color', val)}
+                label="Primary Color"
+                isDarkMode={false}
+              />
             </div>
 
             {/* Secondary Color */}
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-2">Secondary Color</label>
-              <div className="flex items-center space-x-2">
-                <input
-                  type="color"
-                  value={editForm.secondary_color || '#000000'}
-                  onChange={(e) => handleInputChange('secondary_color', e.target.value)}
-                  className="w-16 h-10 border border-gray-300 rounded-lg cursor-pointer"
-                />
-                <input
-                  type="text"
-                  value={editForm.secondary_color || ''}
-                  onChange={(e) => handleInputChange('secondary_color', e.target.value)}
-                  className="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm border border-gray-200 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 bg-white/50 backdrop-blur-sm shadow-sm"
-                  placeholder="#000000"
-                  pattern="^#[0-9A-Fa-f]{6}$"
-                />
-              </div>
+              <MobileColorPicker
+                value={editForm.secondary_color}
+                onChange={(val) => handleInputChange('secondary_color', val)}
+                label="Secondary Color"
+                isDarkMode={false}
+              />
             </div>
 
             {/* Additional Colors */}
@@ -539,28 +520,18 @@ const Profile = () => {
               <div className="space-y-2">
                 {(editForm.additional_colors || []).map((color, index) => (
                   <div key={index} className="flex items-center space-x-2">
-                    <input
-                      type="color"
-                      value={color || '#000000'}
-                      onChange={(e) => {
-                        const newColors = [...(editForm.additional_colors || [])]
-                        newColors[index] = e.target.value
-                        handleInputChange('additional_colors', newColors)
-                      }}
-                      className="w-16 h-10 border border-gray-300 rounded-lg cursor-pointer"
-                    />
-                    <input
-                      type="text"
-                      value={color || ''}
-                      onChange={(e) => {
-                        const newColors = [...(editForm.additional_colors || [])]
-                        newColors[index] = e.target.value
-                        handleInputChange('additional_colors', newColors)
-                      }}
-                      className="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm border border-gray-200 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 bg-white/50 backdrop-blur-sm shadow-sm"
-                      placeholder="#000000"
-                      pattern="^#[0-9A-Fa-f]{6}$"
-                    />
+                    <div className="flex-1">
+                      <MobileColorPicker
+                        value={color}
+                        onChange={(val) => {
+                          const newColors = [...(editForm.additional_colors || [])]
+                          newColors[index] = val
+                          handleInputChange('additional_colors', newColors)
+                        }}
+                        label={`Additional Color ${index + 1}`}
+                        isDarkMode={false}
+                      />
+                    </div>
                     <button
                       type="button"
                       onClick={() => {

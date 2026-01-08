@@ -123,6 +123,14 @@ function CreatedContentDashboard() {
   const [selectedContent, setSelectedContent] = useState(null)
   const [isContentModalOpen, setIsContentModalOpen] = useState(false)
   const [isReelModalOpen, setIsReelModalOpen] = useState(false)
+  const [activeMobilePostId, setActiveMobilePostId] = useState(null)
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   const contentRef = useRef([])
 
@@ -219,6 +227,22 @@ function CreatedContentDashboard() {
   }
 
   const handlePreview = (contentItem) => {
+    // On mobile, first tap shows buttons, second tap opens modal
+    if (isMobile) {
+      if (activeMobilePostId === contentItem.id) {
+        // Second tap - open modal
+        openModal(contentItem)
+      } else {
+        // First tap - set active
+        setActiveMobilePostId(contentItem.id)
+      }
+    } else {
+      // On desktop, open immediately
+      openModal(contentItem)
+    }
+  }
+
+  const openModal = (contentItem) => {
     // Open content modal for preview
     setSelectedContent(contentItem)
 
@@ -1205,18 +1229,26 @@ function CreatedContentDashboard() {
                     )}
 
                     {/* Action Buttons Overlay */}
-                    <div className={`absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 flex flex-col items-center justify-center ${
-                      isDarkMode ? 'group-hover:bg-opacity-60' : ''
+                    <div className={`absolute inset-0 bg-black transition-all duration-200 flex flex-col items-center justify-center ${
+                      activeMobilePostId === contentItem.id 
+                        ? 'bg-opacity-50' 
+                        : 'bg-opacity-0 group-hover:bg-opacity-50'
+                    } ${
+                      isDarkMode ? (activeMobilePostId === contentItem.id ? 'bg-opacity-60' : 'group-hover:bg-opacity-60') : ''
                     }`}>
                       {/* Title Display */}
-                      <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-white text-center p-2 mb-2">
+                      <div className={`transition-opacity duration-200 text-white text-center p-2 mb-2 ${
+                        activeMobilePostId === contentItem.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                      }`}>
                         <div className="text-sm font-medium truncate max-w-full">
                           {contentItem.title || `Content for ${contentItem.platform}`}
                         </div>
                       </div>
 
                       {/* Action Buttons */}
-                      <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex gap-2">
+                      <div className={`transition-opacity duration-200 flex gap-2 ${
+                        activeMobilePostId === contentItem.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                      }`}>
                         <button
                           onClick={(e) => { e.stopPropagation(); handleEdit(contentItem); }}
                           className="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full transition-colors"
@@ -1275,6 +1307,12 @@ function CreatedContentDashboard() {
         <ATSNContentModal
           content={selectedContent}
           onClose={handleCloseModal}
+          onEdit={() => handleEdit(selectedContent)}
+          onSchedule={() => handleSchedule(selectedContent)}
+          onPublish={() => handlePublish(selectedContent)}
+          onDelete={() => handleDelete(selectedContent)}
+          isPublishing={isPublishing}
+          isDeleting={isDeleting}
         />
       )}
 
@@ -1283,6 +1321,12 @@ function CreatedContentDashboard() {
         <ReelModal
           content={selectedContent}
           onClose={handleCloseReelModal}
+          onEdit={() => handleEdit(selectedContent)}
+          onSchedule={() => handleSchedule(selectedContent)}
+          onPublish={() => handlePublish(selectedContent)}
+          onDelete={() => handleDelete(selectedContent)}
+          isPublishing={isPublishing}
+          isDeleting={isDeleting}
         />
       )}
     </div>

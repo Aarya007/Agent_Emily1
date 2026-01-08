@@ -6,6 +6,7 @@ import MediaUpload from './MediaUpload'
 import MultiMediaUpload from './MultiMediaUpload'
 import InfoTooltip from './InfoTooltip'
 import DualRangeSlider from './DualRangeSlider'
+import MobileColorPicker from './MobileColorPicker'
 
 const CreatorOnboardingForm = forwardRef(({
   initialData = null,
@@ -1038,21 +1039,12 @@ const CreatorOnboardingForm = forwardRef(({
                     </div>
                   )}
                 </div>
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="color"
-                    value={formData.primary_color || '#000000'}
-                    onChange={(e) => handleInputChange('primary_color', e.target.value)}
-                    className="w-12 sm:w-16 h-8 sm:h-10 rounded-md cursor-pointer ${Boolean(isDarkMode) ? 'border-gray-600' : 'border-gray-300'}"
-                  />
-                  <input
-                    type="text"
-                    value={formData.primary_color || ''}
-                    onChange={(e) => handleInputChange('primary_color', e.target.value)}
-                    className="flex-1 px-2 sm:px-3 md:px-4 py-2 sm:py-2.5 md:py-3 text-xs sm:text-sm md:text-base ${Boolean(isDarkMode) ? 'border-gray-600' : 'border-gray-300'} rounded-md sm:rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-                    placeholder="#000000"
-                  />
-                </div>
+                <MobileColorPicker
+                  value={formData.primary_color}
+                  onChange={(val) => handleInputChange('primary_color', val)}
+                  label="Primary Color"
+                  isDarkMode={Boolean(isDarkMode)}
+                />
               </div>
               <div>
                 <div className="flex items-center justify-between mb-1.5 sm:mb-2">
@@ -1075,21 +1067,12 @@ const CreatorOnboardingForm = forwardRef(({
                     </div>
                   )}
                 </div>
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="color"
-                    value={formData.secondary_color || '#000000'}
-                    onChange={(e) => handleInputChange('secondary_color', e.target.value)}
-                    className="w-12 sm:w-16 h-8 sm:h-10 rounded-md cursor-pointer ${Boolean(isDarkMode) ? 'border-gray-600' : 'border-gray-300'}"
-                  />
-                  <input
-                    type="text"
-                    value={formData.secondary_color || ''}
-                    onChange={(e) => handleInputChange('secondary_color', e.target.value)}
-                    className="flex-1 px-2 sm:px-3 md:px-4 py-2 sm:py-2.5 md:py-3 text-xs sm:text-sm md:text-base ${Boolean(isDarkMode) ? 'border-gray-600' : 'border-gray-300'} rounded-md sm:rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-                    placeholder="#000000"
-                  />
-                </div>
+                <MobileColorPicker
+                  value={formData.secondary_color}
+                  onChange={(val) => handleInputChange('secondary_color', val)}
+                  label="Secondary Color"
+                  isDarkMode={Boolean(isDarkMode)}
+                />
               </div>
             </div>
 

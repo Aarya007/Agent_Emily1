@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight, Check, X, Save } from 'lucide-react'
 import LogoUpload from './LogoUpload'
 import MediaUpload from './MediaUpload'
 import MultiMediaUpload from './MultiMediaUpload'
+import MobileColorPicker from './MobileColorPicker'
 import InfoTooltip from './InfoTooltip'
 import DualRangeSlider from './DualRangeSlider'
 
@@ -1396,28 +1397,12 @@ const OnboardingForm = forwardRef(({
                       </div>
                     )}
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="color"
-                      value={formData.primary_color || '#000000'}
-                      onChange={(e) => handleInputChange('primary_color', e.target.value)}
-                      className={`w-16 h-10 border rounded-md cursor-pointer ${
-                        Boolean(isDarkMode) ? 'border-gray-600' : 'border-gray-300'
-                      }`}
-                    />
-                    <input
-                      type="text"
-                      value={formData.primary_color || ''}
-                      onChange={(e) => handleInputChange('primary_color', e.target.value)}
-                      className={`flex-1 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent ${
-                        Boolean(isDarkMode)
-                          ? 'bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-400'
-                          : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                      }`}
-                      placeholder="#000000"
-                      pattern="^#[0-9A-Fa-f]{6}$"
-                    />
-                  </div>
+                  <MobileColorPicker
+                    value={formData.primary_color}
+                    onChange={(val) => handleInputChange('primary_color', val)}
+                    label="Primary Color"
+                    isDarkMode={Boolean(isDarkMode)}
+                  />
                 </div>
 
                 <div>
@@ -1441,28 +1426,12 @@ const OnboardingForm = forwardRef(({
                       </div>
                     )}
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="color"
-                      value={formData.secondary_color || '#000000'}
-                      onChange={(e) => handleInputChange('secondary_color', e.target.value)}
-                      className={`w-16 h-10 border rounded-md cursor-pointer ${
-                        Boolean(isDarkMode) ? 'border-gray-600' : 'border-gray-300'
-                      }`}
-                    />
-                    <input
-                      type="text"
-                      value={formData.secondary_color || ''}
-                      onChange={(e) => handleInputChange('secondary_color', e.target.value)}
-                      className={`flex-1 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent ${
-                        Boolean(isDarkMode)
-                          ? 'bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-400'
-                          : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                      }`}
-                      placeholder="#000000"
-                      pattern="^#[0-9A-Fa-f]{6}$"
-                    />
-                  </div>
+                  <MobileColorPicker
+                    value={formData.secondary_color}
+                    onChange={(val) => handleInputChange('secondary_color', val)}
+                    label="Secondary Color"
+                    isDarkMode={Boolean(isDarkMode)}
+                  />
                 </div>
               </div>
 
@@ -1472,34 +1441,18 @@ const OnboardingForm = forwardRef(({
                 <div className="space-y-2">
                   {formData.additional_colors && formData.additional_colors.map((color, index) => (
                     <div key={index} className="flex items-center space-x-2">
-                      <input
-                        type="color"
-                        value={color || '#000000'}
-                        onChange={(e) => {
-                          const newColors = [...formData.additional_colors]
-                          newColors[index] = e.target.value
-                          handleInputChange('additional_colors', newColors)
-                        }}
-                        className={`w-16 h-10 border rounded-md cursor-pointer ${
-                        Boolean(isDarkMode) ? 'border-gray-600' : 'border-gray-300'
-                      }`}
-                      />
-                      <input
-                        type="text"
-                        value={color}
-                        onChange={(e) => {
-                          const newColors = [...formData.additional_colors]
-                          newColors[index] = e.target.value
-                          handleInputChange('additional_colors', newColors)
-                        }}
-                        className={`flex-1 px-2 sm:px-3 md:px-4 py-2 sm:py-2.5 md:py-3 text-xs sm:text-sm md:text-base border rounded-md sm:rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent ${
-                          Boolean(isDarkMode)
-                            ? 'bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-400'
-                            : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                        }`}
-                        placeholder="#000000"
-                        pattern="^#[0-9A-Fa-f]{6}$"
-                      />
+                      <div className="flex-1">
+                        <MobileColorPicker
+                          value={color}
+                          onChange={(val) => {
+                            const newColors = [...formData.additional_colors]
+                            newColors[index] = val
+                            handleInputChange('additional_colors', newColors)
+                          }}
+                          label={`Additional Color ${index + 1}`}
+                          isDarkMode={Boolean(isDarkMode)}
+                        />
+                      </div>
                       <button
                         type="button"
                         onClick={() => {

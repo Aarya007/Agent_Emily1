@@ -28,6 +28,8 @@ import { SocialMediaCacheProvider } from './contexts/SocialMediaCacheContext'
 import { ThemeProvider } from './contexts/ThemeContext'
 import { onboardingAPI } from './services/onboarding'
 import NotificationWindow from './components/NotificationWindow'
+import { MantineProvider } from '@mantine/core'
+import '@mantine/core/styles.css'
 //  Components
 import LandingPage from './pages/LandingPage.jsx'
 import PrivacyPolicy from './pages/PrivacyPolicy.jsx'
@@ -306,19 +308,21 @@ function AppContent() {
 function App() {
   return (
     <HelmetProvider>
-      <ErrorBoundary>
-        <ThemeProvider>
-          <AuthProvider>
-            <NotificationProvider>
-              <ContentCacheProvider>
-                <SocialMediaCacheProvider>
-                  <AppContent />
-                </SocialMediaCacheProvider>
-              </ContentCacheProvider>
-            </NotificationProvider>
-          </AuthProvider>
-        </ThemeProvider>
-      </ErrorBoundary>
+      <MantineProvider defaultColorScheme="light">
+        <ErrorBoundary>
+          <ThemeProvider>
+            <AuthProvider>
+              <NotificationProvider>
+                <ContentCacheProvider>
+                  <SocialMediaCacheProvider>
+                    <AppContent />
+                  </SocialMediaCacheProvider>
+                </ContentCacheProvider>
+              </NotificationProvider>
+            </AuthProvider>
+          </ThemeProvider>
+        </ErrorBoundary>
+      </MantineProvider>
     </HelmetProvider>
   )
 }

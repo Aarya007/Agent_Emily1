@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { X, Hash, Edit, Check, X as XIcon, Sparkles, RefreshCw, Copy } from 'lucide-react'
+import { X, Hash, Edit, Check, X as XIcon, Sparkles, RefreshCw, Copy, Clock, Send, Trash2 } from 'lucide-react'
 import { Instagram, Facebook, MessageCircle } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 
@@ -37,9 +37,25 @@ const useStorageListener = (key, callback) => {
   }, [key, callback])
 }
 
-const ATSNContentModal = ({ content, onClose }) => {
+const ATSNContentModal = ({ 
+  content, 
+  onClose,
+  onEdit,
+  onSchedule,
+  onPublish,
+  onDelete,
+  isPublishing = false,
+  isDeleting = false
+}) => {
   const [profileData, setProfileData] = useState(null)
   const [isEditing, setIsEditing] = useState(false)
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
   const [editTitleValue, setEditTitleValue] = useState('')
   const [editContentValue, setEditContentValue] = useState('')
   const [editHashtagsValue, setEditHashtagsValue] = useState('')
@@ -368,18 +384,20 @@ const ATSNContentModal = ({ content, onClose }) => {
   }
 
   return (
-    <div
-      className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm z-30"
-      onClick={onClose}
-    >
+    <>
+      {/* Main Modal */}
       <div
-        className="fixed inset-0 flex items-center justify-center p-4"
-        onClick={(e) => e.stopPropagation()}
+        className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm z-30"
+        onClick={onClose}
       >
-        <div className={`relative max-w-6xl w-full rounded-2xl shadow-2xl overflow-hidden ${
-          isDarkMode ? 'bg-gray-800' : 'bg-white'
-        }`}>
-          {/* Header */}
+        <div
+          className="fixed inset-0 flex items-center justify-center p-4"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className={`relative max-w-6xl w-full rounded-2xl shadow-2xl overflow-hidden ${
+            isDarkMode ? 'bg-gray-800' : 'bg-white'
+          }`}>
+            {/* Header */}
           <div className={`flex items-center justify-between p-6 border-b ${
             isDarkMode
               ? 'border-gray-700 bg-gradient-to-r from-gray-700 to-gray-600'
@@ -820,15 +838,63 @@ const ATSNContentModal = ({ content, onClose }) => {
                   }`}>{content.message}</div>
                 </div>
               )}
-                </div>
-              )}
             </div>
-          </div>
+          )}
         </div>
       </div>
 
+        {/* Mobile Action Footer */}
+        {isMobile && (
+          <div className={`p-4 border-t flex justify-around items-center ${
+            isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-50'
+          }`}>
+            <button
+              onClick={(e) => { e.stopPropagation(); if (!isEditing) handleEdit(); }}
+              className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-colors ${
+                isDarkMode ? 'text-blue-400 hover:bg-gray-700' : 'text-blue-600 hover:bg-gray-100'
+              }`}
+            >
+              <Edit className="w-5 h-5" />
+              <span className="text-[10px]">Edit</span>
+            </button>
+            <button
+              onClick={(e) => { e.stopPropagation(); onSchedule(); }}
+              className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-colors ${
+                isDarkMode ? 'text-green-400 hover:bg-gray-700' : 'text-green-600 hover:bg-gray-100'
+              }`}
+            >
+              <Clock className="w-5 h-5" />
+              <span className="text-[10px]">Schedule</span>
+            </button>
+            <button
+              onClick={(e) => { e.stopPropagation(); onPublish(); }}
+              disabled={isPublishing}
+              className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-colors ${
+                isDarkMode ? 'text-purple-400 hover:bg-gray-700' : 'text-purple-600 hover:bg-gray-100'
+              } ${isPublishing ? 'opacity-50' : ''}`}
+            >
+              {isPublishing ? <RefreshCw className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
+              <span className="text-[10px]">Publish</span>
+            </button>
+            <button
+              onClick={(e) => { e.stopPropagation(); onDelete(); }}
+              disabled={isDeleting}
+              className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-colors ${
+                isDarkMode ? 'text-red-400 hover:bg-gray-700' : 'text-red-600 hover:bg-gray-100'
+              } ${isDeleting ? 'opacity-50' : ''}`}
+            >
+              {isDeleting ? <RefreshCw className="w-5 h-5 animate-spin" /> : <Trash2 className="w-5 h-5" />}
+              <span className="text-[10px]">Delete</span>
+          </button>
+        </div>
+      )}
+    </div>
+  </div>
+</div>
+
       {/* AI Edit Modal */}
       {showAIEditModal && (
+        <>
         <div
           className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm z-[60]"
           onClick={handleCancelAIEdit}
@@ -1042,6 +1108,7 @@ const ATSNContentModal = ({ content, onClose }) => {
             </div>
           </div>
         </div>
+        </>
       )}
       {/* Image Edit Modal */}
       {showImageEditModal && (
@@ -1329,11 +1396,12 @@ const ATSNContentModal = ({ content, onClose }) => {
 
       {/* Success Modal */}
       {showSuccessModal && (
+        <>
         <div className="fixed inset-0 flex items-center justify-center p-4 z-50">
           <div
             className="fixed inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setShowSuccessModal(false)}
-          />
+          ></div>
           <div className={`relative max-w-md w-full rounded-2xl shadow-2xl overflow-hidden ${
             isDarkMode ? 'bg-gray-800' : 'bg-white'
           }`}>
@@ -1413,10 +1481,11 @@ const ATSNContentModal = ({ content, onClose }) => {
             </div>
           </div>
         </div>
+        </>
       )}
-
-    </div>
+    </>
   )
 }
 
 export default ATSNContentModal
+
